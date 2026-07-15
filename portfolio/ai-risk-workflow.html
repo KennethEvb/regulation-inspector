@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>AI Risk Assessment Workflow — Case Study · Kenneth Evbuomwan</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Concept case study: an AI Risk Assessment Workflow on the Microsoft Power Platform — standardised intake (Power Apps), automated scoring and approval routing (Power Automate), a structured Dataverse data model, and Power BI governance dashboards.">
+<meta name="author" content="Kenneth Evbuomwan">
+<link rel="canonical" href="https://kennethevb.github.io/ai-risk-workflow.html">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://kennethevb.github.io/ai-risk-workflow.html">
+<meta property="og:title" content="AI Risk Assessment Workflow — Case Study">
+<meta property="og:description" content="Replacing spreadsheet-and-email AI governance with a structured Power Platform workflow — intake, scoring, approvals, and dashboards.">
+<meta property="og:image" content="https://avatars.githubusercontent.com/u/298627660?v=4">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%231F6F6B'/%3E%3Ctext x='32' y='45' font-family='Georgia, serif' font-size='38' font-weight='700' fill='%23F5F4EF' text-anchor='middle'%3EK%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Spectral:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#14171F;
+    --ink-2:#262B36;
+    --paper:#F5F4EF;
+    --paper-2:#EBE9E1;
+    --teal:#1F6F6B;
+    --teal-deep:#154F4C;
+    --mark:#F0B94D;
+    --mark-deep:#C9922A;
+    --line:#DBD8CC;
+    --soft:#5B6472;
+    --red:#B03A32;
+    --green:#2F7A4D;
+    --amber:#B5791E;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0; background:var(--paper); color:var(--ink);
+    font-family:'Inter',sans-serif; -webkit-font-smoothing:antialiased; line-height:1.6;
+  }
+  h1,h2,h3{font-family:'Spectral',serif; margin:0; color:var(--ink);}
+  .mono{font-family:'JetBrains Mono',monospace;}
+  a{color:inherit;}
+  .wrap{max-width:1040px; margin:0 auto; padding:0 32px;}
+  section{padding:88px 0;}
+  .eyebrow{
+    font-family:'JetBrains Mono',monospace; font-size:11.5px; letter-spacing:1.4px; text-transform:uppercase;
+    color:var(--teal-deep); font-weight:500; margin-bottom:14px; display:flex; align-items:center; gap:10px;
+  }
+  .eyebrow::before{content:""; width:22px; height:1px; background:var(--teal-deep);}
+
+  .liquid-glass{
+    background-color: rgba(255,255,255,0.65);
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.5);
+    box-shadow: inset 0 1px 1px rgba(255,255,255,0.8), 0 10px 30px -10px rgba(20,23,31,0.08);
+  }
+  .glass-section{background-color: rgba(255,255,255,0.45); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); position:relative; overflow:hidden;}
+  .glass-section > .wrap{position:relative; z-index:1;}
+  .nav-wrap{position:fixed; top:16px; left:0; right:0; z-index:50; padding:0 20px; pointer-events:none;}
+  nav{
+    max-width:1040px; margin:0 auto; border-radius:999px; padding:12px 28px;
+    display:flex; justify-content:space-between; align-items:center;
+    box-shadow:0 10px 30px -8px rgba(20,23,31,0.15); pointer-events:auto;
+    transition:all .3s ease;
+  }
+  .back-link{font-size:13px; color:var(--soft); text-decoration:none; font-weight:500; padding:6px 13px; border-radius:999px; transition:all .2s ease;}
+  .back-link:hover{background:rgba(20,23,31,0.05); color:var(--teal-deep);}
+  .nav-links{display:flex; align-items:center; gap:4px; font-size:12px; font-weight:600;}
+  .nav-links a{text-decoration:none; color:var(--ink-2); padding:6px 12px; border-radius:999px; transition:all .2s ease;}
+  .nav-links a:hover{background:rgba(20,23,31,0.05); color:var(--teal-deep);}
+  .btn{font-size:13px; font-weight:600; padding:9px 18px; border-radius:3px; text-decoration:none; background:var(--ink); color:var(--paper); font-family:'Inter',sans-serif;}
+  .nav-btn{font-size:11px; font-weight:600; padding:8px 18px; border-radius:999px; text-decoration:none; background:var(--ink); color:var(--paper); font-family:'Inter',sans-serif; box-shadow:0 2px 8px rgba(20,23,31,0.15); transition:all .2s ease;}
+  .nav-btn:hover{background:var(--ink-2); transform:scale(1.05);}
+  .ambient-orb{position:absolute; border-radius:50%; filter:blur(70px); pointer-events:none; z-index:0;}
+
+  .hero{padding:150px 0 70px; position:relative; overflow:hidden;}
+  .hero-grid{display:grid; grid-template-columns:1.05fr 0.95fr; gap:56px; align-items:center;}
+  .hero h1{font-size:46px; font-weight:600; line-height:1.12; letter-spacing:-0.5px;}
+  .hero .lede{font-size:16px; color:var(--soft); margin-top:20px; max-width:460px;}
+  .tag-row{display:flex; flex-wrap:wrap; gap:8px; margin-top:26px;}
+  .tag{font-family:'JetBrains Mono',monospace; font-size:11px; padding:5px 11px; border-radius:3px; background:var(--paper-2); border:1px solid var(--line); color:var(--ink-2);}
+  .hero-ctas{margin-top:30px; display:flex; gap:14px;}
+  .btn-ghost{font-size:13px; font-weight:600; padding:9px 18px; border-radius:3px; text-decoration:none; border:1px solid var(--ink); color:var(--ink);}
+
+  /* Hero assessment card */
+  .assess-card{background:#fff; border:1px solid var(--line); border-radius:6px; padding:26px 28px; box-shadow:0 24px 48px -24px rgba(20,23,31,0.18); position:relative;}
+  .assess-card .doc-label{font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--soft); margin-bottom:16px; letter-spacing:0.4px;}
+  .factor{display:grid; grid-template-columns:110px 1fr 34px; gap:12px; align-items:center; margin-bottom:10px;}
+  .factor .f-name{font-size:12.5px; color:var(--ink-2); font-weight:500;}
+  .factor .f-bar{height:7px; border-radius:4px; background:var(--paper-2); overflow:hidden;}
+  .factor .f-bar > div{height:100%; border-radius:4px;}
+  .factor .f-score{font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--soft); text-align:right;}
+  .assess-verdict{margin-top:16px; padding-top:16px; border-top:1px dashed var(--line); display:flex; align-items:center; justify-content:space-between; gap:12px;}
+  .assess-verdict .badge{font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:500; padding:4px 10px; border-radius:20px; background:var(--amber); color:#fff;}
+  .assess-verdict .w-note{font-size:10.5px; color:var(--soft); font-family:'JetBrains Mono',monospace;}
+  .chain{margin-top:14px; display:flex; align-items:center; flex-wrap:wrap; gap:6px;}
+  .chain .hop{display:inline-flex; align-items:center; gap:6px; font-size:11.5px; padding:4px 10px; border-radius:20px; border:1px solid var(--line); background:var(--paper-2); color:var(--ink-2);}
+  .chain .hop .dot{width:7px; height:7px; border-radius:50%;}
+  .chain .hop .dot.ok{background:var(--green);}
+  .chain .hop .dot.wait{background:#C7C2B2;}
+  .chain .sep{color:var(--line); font-size:13px;}
+
+  .lead-block{max-width:680px;}
+  .lead-block h2{font-size:30px; font-weight:600; line-height:1.25;}
+  .lead-block p{font-size:15.5px; color:var(--ink-2); margin-top:16px;}
+
+  .pipeline{display:grid; grid-template-columns:repeat(4,1fr); gap:0; margin-top:48px; position:relative;}
+  .pipeline::before{content:""; position:absolute; top:22px; left:6%; right:6%; height:1px; background:var(--line); z-index:0;}
+  .step{position:relative; z-index:1; padding-right:20px;}
+  .step .num{width:44px; height:44px; border-radius:50%; background:var(--ink); color:var(--paper); display:flex; align-items:center; justify-content:center; font-family:'JetBrains Mono',monospace; font-size:14px; margin-bottom:18px;}
+  .step h3{font-size:15px; font-weight:600;}
+  .step p{font-size:13px; color:var(--soft); margin-top:8px; line-height:1.55;}
+
+  /* Process flow diagram */
+  .pflow-wrap{background:#fff; border:1px solid var(--line); border-radius:8px; padding:28px 28px 20px; margin-top:40px; overflow-x:auto; box-shadow:0 24px 48px -28px rgba(20,23,31,0.18);}
+  .pflow-wrap svg{min-width:860px; display:block; width:100%;}
+  .pf-node{fill:#fff; stroke:var(--line); stroke-width:1;}
+  .pf-node-accent{fill:var(--paper-2); stroke:var(--line); stroke-width:1;}
+  .pf-eyebrow{font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; fill:var(--teal-deep); font-weight:500;}
+  .pf-title{font-family:'Inter',sans-serif; font-size:13.5px; font-weight:600; fill:var(--ink);}
+  .pf-sub{font-family:'Inter',sans-serif; font-size:10px; fill:var(--soft);}
+  .pf-line{font-family:'JetBrains Mono',monospace; font-size:9px; fill:var(--ink-2);}
+  .pf-arrow{stroke:var(--soft); stroke-width:1.5; fill:none;}
+  .pf-arrow.dashed{stroke-dasharray:4 4; opacity:0.65;}
+  .pf-badge-c{fill:var(--ink);}
+  .pf-badge-t{font-family:'JetBrains Mono',monospace; font-size:9px; fill:var(--paper); font-weight:500; text-anchor:middle;}
+  .pf-legend{display:flex; flex-wrap:wrap; gap:10px 22px; margin-top:22px; padding-top:18px; border-top:1px dashed var(--line);}
+  .pf-legend span{display:inline-flex; align-items:baseline; gap:8px; font-size:12px; color:var(--ink-2);}
+  .pf-legend .n{font-family:'JetBrains Mono',monospace; font-size:9.5px; background:var(--ink); color:var(--paper); border-radius:50%; width:18px; height:18px; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; transform:translateY(3px);}
+  .storage-note{font-size:13.5px; color:var(--soft); margin-top:24px; max-width:680px; line-height:1.6;}
+  .storage-note strong{color:var(--ink-2);}
+
+  .showcase{background:var(--ink); color:var(--paper); border-radius:10px; padding:44px 44px 0; overflow:hidden;}
+  .showcase-head{display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:28px; flex-wrap:wrap; gap:16px;}
+  .showcase-head h2{color:#fff; font-size:26px;}
+  .showcase-head p{color:#A7ADBB; font-size:13.5px; max-width:420px; margin-top:8px;}
+  .view-tabs{display:flex; gap:6px;}
+  .vtab{font-size:12.5px; font-weight:500; padding:8px 14px; border-radius:20px; cursor:pointer; color:#A7ADBB; border:1px solid #333A4A;}
+  .vtab.active{background:var(--mark); color:var(--ink); border-color:var(--mark); font-weight:600;}
+  .screen{background:var(--paper); border-radius:8px 8px 0 0; padding:26px 26px 0; margin-top:6px; max-height:640px; overflow:hidden;}
+  .dview{display:none;}
+  .dview.active{display:block;}
+
+  .kpi-row{display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:20px;}
+  .kpi{background:#fff; border:1px solid var(--line); border-radius:6px; padding:14px 16px;}
+  .kpi .label{font-size:10px; text-transform:uppercase; letter-spacing:0.5px; color:var(--soft); font-weight:600;}
+  .kpi .value{font-family:'Spectral',serif; font-size:24px; margin-top:4px;}
+
+  .panel{background:#fff; border:1px solid var(--line); border-radius:6px; padding:18px;}
+  .panel h4{font-family:'Inter',sans-serif; font-size:11px; text-transform:uppercase; letter-spacing:0.5px; color:var(--soft); font-weight:600; margin:0 0 14px;}
+  .two-col{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
+  .dist-row{display:grid; grid-template-columns:70px 1fr 30px; gap:10px; align-items:center; margin-bottom:10px;}
+  .dist-row .d-name{font-size:12px; color:var(--ink-2);}
+  .dist-row .d-bar{height:12px; border-radius:6px; background:var(--paper-2); overflow:hidden;}
+  .dist-row .d-bar > div{height:100%; border-radius:6px;}
+  .dist-row .d-val{font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--soft); text-align:right;}
+
+  table{width:100%; border-collapse:collapse; background:#fff; border:1px solid var(--line); border-radius:6px; overflow:hidden;}
+  thead th{text-align:left; font-size:10px; text-transform:uppercase; letter-spacing:0.4px; color:var(--soft); padding:10px 14px; border-bottom:1px solid var(--line); background:var(--paper-2);}
+  tbody td{padding:11px 14px; border-bottom:1px solid var(--line); font-size:12.5px;}
+  tbody tr:last-child td{border-bottom:none;}
+  .sev{font-size:10.5px; font-weight:600; padding:2px 8px; border-radius:4px; white-space:nowrap;}
+  .sev-high{background:#F8E7E4; color:var(--red);} .sev-med{background:#FBF0DC; color:var(--amber);} .sev-low{background:#E5F1E9; color:var(--green);}
+  .sev-btn{border:none; cursor:pointer; font-family:'Inter',sans-serif;}
+  .sev-btn:focus-visible{outline:2px solid var(--teal); outline-offset:2px;}
+  .stage{font-size:11.5px; color:var(--soft);}
+
+  .risk-popover{
+    position:absolute; z-index:100; width:270px; background:#fff; border:1px solid var(--line);
+    border-radius:8px; box-shadow:0 20px 44px -16px rgba(20,23,31,0.35); padding:16px 18px;
+    font-size:12.5px; color:var(--ink-2); display:none; text-align:left;
+  }
+  .risk-popover.open{display:block;}
+  .risk-popover .pop-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;}
+  .risk-popover .pop-title{font-family:'JetBrains Mono',monospace; font-size:10px; text-transform:uppercase; letter-spacing:0.5px; color:var(--soft);}
+  .risk-popover .pop-close{background:none; border:none; color:var(--soft); cursor:pointer; font-size:14px; line-height:1; padding:2px;}
+  .risk-popover .pop-arrow{position:absolute; top:-6px; left:24px; width:12px; height:12px; background:#fff; border-left:1px solid var(--line); border-top:1px solid var(--line); transform:rotate(45deg);}
+  .risk-popover .pop-note{font-size:11px; color:var(--soft); margin-top:10px; padding-top:10px; border-top:1px dashed var(--line); line-height:1.5;}
+
+  .fade-bottom{height:36px; background:linear-gradient(180deg, transparent, var(--paper));}
+
+  /* Dataverse model cards */
+  .model-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-top:40px;}
+  .model-card{
+    border-radius:6px; padding:18px;
+    background-color: rgba(255,255,255,0.65);
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.5);
+    box-shadow: inset 0 1px 1px rgba(255,255,255,0.8), 0 10px 30px -10px rgba(20,23,31,0.08);
+    transition:box-shadow .3s ease, transform .3s ease;
+  }
+  .model-card:hover{box-shadow:0 16px 32px -16px rgba(20,23,31,0.2); transform:translateY(-2px) scale(1.02);}
+  .model-card .t-name{font-size:14px; font-weight:600; font-family:'Inter',sans-serif;}
+  .model-card .t-purpose{font-size:11.5px; color:var(--soft); margin-top:3px; line-height:1.5;}
+  .model-card ul{list-style:none; margin:12px 0 0; padding:12px 0 0; border-top:1px dashed var(--line);}
+  .model-card li{font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--ink-2); padding:2.5px 0; letter-spacing:0.2px;}
+  .model-card li .pk{color:var(--teal-deep); font-weight:500;}
+
+  /* Workflow flow cards */
+  .gov-flow{display:flex; align-items:flex-start; gap:14px; margin-top:40px;}
+  .gov-step{
+    flex:1; border-radius:8px; padding:20px;
+    background-color: rgba(255,255,255,0.65);
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.5);
+    box-shadow: inset 0 1px 1px rgba(255,255,255,0.8), 0 10px 30px -10px rgba(20,23,31,0.08);
+    transition:box-shadow .3s ease, transform .3s ease;
+  }
+  .gov-step:hover{box-shadow:0 16px 32px -16px rgba(20,23,31,0.2); transform:translateY(-2px) scale(1.02);}
+  .gov-icon{width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:15px; margin-bottom:14px;}
+  .gov-icon.trigger{background:#E1EEEE; color:var(--teal-deep);}
+  .gov-icon.score{background:#FBF0DC; color:var(--amber);}
+  .gov-icon.route{background:#E5F1E9; color:var(--green);}
+  .gov-icon.log{background:var(--ink); color:var(--mark);}
+  .gov-step h3{font-size:14.5px; font-weight:600; margin-bottom:8px;}
+  .gov-step p{font-size:12.5px; color:var(--soft); line-height:1.55;}
+  .gov-arrow{font-size:20px; color:var(--line); padding-top:34px; flex-shrink:0;}
+  .branch-note{
+    margin-top:22px; padding:14px 18px; border-radius:6px; background:var(--paper-2);
+    border:1px solid var(--line); font-size:12.5px; color:var(--ink-2); max-width:680px;
+  }
+  .branch-note .mono{font-size:11px; color:var(--teal-deep);}
+
+  .fw-row{display:flex; flex-wrap:wrap; gap:8px; margin-top:20px;}
+
+  /* Impact */
+  .impact-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-top:40px;}
+  .impact-card{
+    border-radius:8px; padding:22px;
+    background-color: rgba(255,255,255,0.65);
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.5);
+    box-shadow: inset 0 1px 1px rgba(255,255,255,0.8), 0 10px 30px -10px rgba(20,23,31,0.08);
+    transition:box-shadow .3s ease, transform .3s ease;
+  }
+  .impact-card:hover{box-shadow:0 16px 32px -16px rgba(20,23,31,0.2); transform:translateY(-2px) scale(1.02);}
+  .impact-card .i-cat{font-family:'JetBrains Mono',monospace; font-size:10px; text-transform:uppercase; color:var(--teal-deep); letter-spacing:0.5px;}
+  .impact-card .i-big{font-family:'Spectral',serif; font-size:26px; font-weight:700; margin-top:8px; color:var(--ink);}
+  .impact-card .i-big .from{color:var(--soft); font-size:16px; font-weight:400; text-decoration:line-through; margin-right:6px;}
+  .impact-card p{font-size:12.5px; color:var(--soft); margin:8px 0 0; line-height:1.55;}
+  .modelled-note{font-size:12px; color:var(--soft); margin-top:18px; font-style:italic;}
+
+  .reflect-grid{display:grid; grid-template-columns:1fr 1fr; gap:32px; margin-top:36px;}
+  .reflect-card h3{font-size:15px; font-weight:600; margin-bottom:10px;}
+  .reflect-card p{font-size:13.5px; color:var(--ink-2); line-height:1.65;}
+
+  .stack-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-top:40px;}
+  .stack-card{
+    border-radius:6px; padding:18px;
+    background-color: rgba(255,255,255,0.65);
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.5);
+    box-shadow: inset 0 1px 1px rgba(255,255,255,0.8), 0 10px 30px -10px rgba(20,23,31,0.08);
+    transition:box-shadow .3s ease, transform .3s ease;
+  }
+  .stack-card:hover{box-shadow:0 16px 32px -16px rgba(20,23,31,0.2); transform:translateY(-2px) scale(1.02);}
+  .stack-card .cat{font-family:'JetBrains Mono',monospace; font-size:10px; text-transform:uppercase; color:var(--teal-deep); letter-spacing:0.5px;}
+  .stack-card .item{font-size:14px; font-weight:600; margin-top:6px;}
+  .stack-card .desc{font-size:12px; color:var(--soft); margin-top:4px; line-height:1.5;}
+
+  footer{border-top:1px solid var(--line); padding:40px 0; text-align:center;}
+  footer p{font-size:12.5px; color:var(--soft);}
+  footer .flinks{display:flex; gap:20px; justify-content:center; margin-top:12px; font-size:13px; font-weight:500;}
+  footer .flinks a{text-decoration:none;}
+
+  @media (max-width: 820px){
+    .hero-grid, .reflect-grid, .two-col{grid-template-columns:1fr;}
+    .kpi-row, .stack-grid{grid-template-columns:repeat(2,1fr);}
+    .model-grid, .impact-grid{grid-template-columns:1fr 1fr;}
+    .pipeline{grid-template-columns:1fr 1fr; row-gap:32px;}
+    .pipeline::before{display:none;}
+    .gov-flow{flex-direction:column;}
+    .gov-arrow{display:none;}
+  }
+
+  /* Dropdown Styles */
+  .dropdown-container {
+    position: relative;
+    display: inline-block;
+    pointer-events: auto;
+  }
+  .dropdown-trigger {
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    user-select: none;
+  }
+  .dropdown-menu {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    width: 230px;
+    border-radius: 12px;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.3s;
+    z-index: 100;
+    text-align: left;
+  }
+  .dropdown-container:hover .dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+  .dropdown-menu a {
+    display: block;
+    padding: 10px 14px;
+    font-size: 12.5px;
+    font-weight: 500;
+    text-decoration: none;
+    color: var(--ink-2);
+    border-radius: 8px;
+    transition: background 0.2s ease, color 0.2s ease;
+  }
+  .dropdown-menu a:hover {
+    background: rgba(20,23,31,0.06);
+    color: var(--teal-deep);
+  }
+  .dropdown-menu a.active {
+    background: rgba(31,111,107,0.08);
+    color: var(--teal-deep);
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+
+<div class="nav-wrap">
+  <nav class="liquid-glass">
+    <a class="back-link" href="index.html">← Back to portfolio</a>
+    <div class="nav-links">
+      <a href="#approach">Approach</a>
+      <a href="#process-flow">Process flow</a>
+      <a href="#dashboards">Dashboards</a>
+      <a href="#data-model">Data model</a>
+      <a href="#workflow">Workflow</a>
+      <a href="#impact">Impact</a>
+    </div>
+    <div class="dropdown-container">
+      <a class="nav-btn dropdown-trigger">Case Studies ▾</a>
+      <div class="dropdown-menu liquid-glass">
+        <a href="regulation-inspector.html">Regulation Inspector</a>
+        <a href="ai-risk-workflow.html" class="active">AI Risk Workflow</a>
+        <a href="team-resource-tool.html">Team Resource Tool</a>
+        <a href="stock-time-machine.html">Stock Time Machine</a>
+      </div>
+    </div>
+  </nav>
+</div>
+
+<header class="hero">
+  <div class="ambient-orb" style="top:-15%; left:-10%; width:480px; height:480px; background:linear-gradient(135deg, rgba(31,111,107,0.14), rgba(240,185,77,0.07));"></div>
+  <div class="ambient-orb" style="top:30%; right:-15%; width:560px; height:560px; background:linear-gradient(225deg, rgba(31,111,107,0.06), rgba(240,185,77,0.13));"></div>
+  <div class="wrap hero-grid" style="position:relative; z-index:1;">
+    <div>
+      <div class="eyebrow">Concept Case Study</div>
+      <h1>AI governance shouldn't live in email threads and spreadsheets.</h1>
+      <p class="lede">A structured AI Risk Assessment Workflow on the Microsoft Power Platform — standardised intake, automated scoring and approval routing, a single source of truth in Dataverse, and real-time governance dashboards in Power BI.</p>
+      <div class="tag-row">
+        <span class="tag">POWER APPS</span>
+        <span class="tag">POWER AUTOMATE</span>
+        <span class="tag">DATAVERSE</span>
+        <span class="tag">POWER BI</span>
+        <span class="tag">PROCESS DESIGN</span>
+        <span class="tag">RESPONSIBLE AI</span>
+      </div>
+      <div class="hero-ctas">
+        <a class="btn" href="#dashboards">See the dashboard</a>
+        <a class="btn-ghost" href="#data-model">View the data model</a>
+      </div>
+    </div>
+
+    <div class="assess-card">
+      <div class="doc-label mono">ASSESSMENT RECORD · UC-0042 · CUSTOMER CHURN MODEL</div>
+      <div class="factor">
+        <span class="f-name">Privacy</span>
+        <div class="f-bar"><div style="width:80%; background:var(--red);"></div></div>
+        <span class="f-score">4/5</span>
+      </div>
+      <div class="factor">
+        <span class="f-name">Bias</span>
+        <div class="f-bar"><div style="width:60%; background:var(--amber);"></div></div>
+        <span class="f-score">3/5</span>
+      </div>
+      <div class="factor">
+        <span class="f-name">Security</span>
+        <div class="f-bar"><div style="width:40%; background:var(--green);"></div></div>
+        <span class="f-score">2/5</span>
+      </div>
+      <div class="factor">
+        <span class="f-name">Transparency</span>
+        <div class="f-bar"><div style="width:60%; background:var(--amber);"></div></div>
+        <span class="f-score">3/5</span>
+      </div>
+      <div class="assess-verdict">
+        <span class="badge">MEDIUM RISK · 3.1</span>
+        <span class="w-note">WEIGHTED · 4 FACTORS</span>
+      </div>
+      <div class="chain">
+        <span class="hop"><span class="dot ok"></span>Privacy · 14 Jul</span>
+        <span class="sep">→</span>
+        <span class="hop"><span class="dot ok"></span>Security · 15 Jul</span>
+        <span class="sep">→</span>
+        <span class="hop"><span class="dot wait"></span>AI Governance · pending</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section id="context">
+  <div class="wrap">
+    <div class="lead-block">
+      <div class="eyebrow">The problem</div>
+      <h2>AI systems get deployed faster than they get assessed.</h2>
+      <p>In most organisations, AI risk assessment lives in Word documents, email chains, and untracked spreadsheet approvals. The result is predictable: inconsistent risk scoring between teams, slow approval cycles, no visibility for leadership, and no single source of truth when a regulator — or an internal auditor — asks which AI systems are running and who signed them off. This concept explores whether the same governance discipline applied to regulatory text in <a href="regulation-inspector.html" style="color:var(--teal-deep); font-weight:600;">Regulation Inspector</a> can be applied to the AI systems themselves, using the Microsoft Power Platform as the delivery vehicle.</p>
+    </div>
+  </div>
+</section>
+
+<section id="approach">
+  <div class="wrap">
+    <div class="eyebrow">The approach</div>
+    <h2 style="font-size:30px;">From ad-hoc documents to a structured workflow</h2>
+    <div class="pipeline">
+      <div class="step">
+        <div class="num">01</div>
+        <h3>Standardised intake</h3>
+        <p>A guided Power Apps form captures every use case the same way — owner, model type, dataset sources, intended use — with conditional privacy questions when personal data is involved.</p>
+      </div>
+      <div class="step">
+        <div class="num">02</div>
+        <h3>Automated scoring</h3>
+        <p>Power Automate scores each submission against weighted risk factors — privacy, bias, security, transparency — producing a consistent overall rating instead of a gut feel.</p>
+      </div>
+      <div class="step">
+        <div class="num">03</div>
+        <h3>Routed approvals</h3>
+        <p>Risk level drives routing: high-risk cases go to Privacy, Security, and AI Governance; low-risk cases take a lighter path. SLA reminders and escalations keep approvals moving.</p>
+      </div>
+      <div class="step">
+        <div class="num">04</div>
+        <h3>Live reporting</h3>
+        <p>Every decision lands in Dataverse and surfaces in Power BI — risk distribution, cycle times, bottlenecks, and a full model inventory by business unit.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="process-flow">
+  <div class="wrap">
+    <div class="eyebrow">Process flow</div>
+    <h2 style="font-size:30px;">From form to dashboard</h2>
+    <p style="font-size:15.5px; color:var(--ink-2); margin-top:16px; max-width:680px;">How the components hand off to each other: Power Apps captures the submission, Dataverse holds the record (with evidence files in SharePoint), Power Automate orchestrates scoring and approvals through Teams and Outlook, and every decision lands back in the same dataset that Power BI reports from.</p>
+
+    <div class="pflow-wrap">
+      <svg viewBox="0 0 980 580" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Process flow diagram: Power Apps form submission creates a record in Dataverse with evidence files stored in SharePoint; Power Automate triggers on the new record, requests approvals through Microsoft Teams and Outlook, writes scores, approvals and the audit log back to Dataverse; Power BI reads the live dataset for governance dashboards.">
+        <defs>
+          <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="#5B6472"/>
+          </marker>
+        </defs>
+
+        <!-- Power Apps -->
+        <rect class="pf-node" x="30" y="210" width="160" height="132" rx="10"/>
+        <text class="pf-eyebrow" x="46" y="236">CAPTURE</text>
+        <text class="pf-title" x="46" y="257">Power Apps</text>
+        <text class="pf-sub" x="46" y="273">Guided intake form</text>
+        <text class="pf-line" x="46" y="296">· use case &amp; owner</text>
+        <text class="pf-line" x="46" y="310">· model type &amp; datasets</text>
+        <text class="pf-line" x="46" y="324">· personal data? Y/N</text>
+
+        <!-- SharePoint -->
+        <rect class="pf-node-accent" x="30" y="420" width="160" height="90" rx="10"/>
+        <text class="pf-eyebrow" x="46" y="446">EVIDENCE</text>
+        <text class="pf-title" x="46" y="467">SharePoint</text>
+        <text class="pf-sub" x="46" y="483">Evidence &amp; attachments</text>
+
+        <!-- Dataverse -->
+        <rect class="pf-node" x="270" y="180" width="160" height="120" rx="10"/>
+        <text class="pf-eyebrow" x="286" y="206">STORE</text>
+        <text class="pf-title" x="286" y="227">Dataverse</text>
+        <text class="pf-sub" x="286" y="243">System of record</text>
+        <text class="pf-line" x="286" y="266">use cases · scores</text>
+        <text class="pf-line" x="286" y="280">approvals · audit log</text>
+
+        <!-- Teams -->
+        <rect class="pf-node-accent" x="530" y="40" width="160" height="84" rx="10"/>
+        <text class="pf-eyebrow" x="546" y="66">APPROVE</text>
+        <text class="pf-title" x="546" y="87">Microsoft Teams</text>
+        <text class="pf-sub" x="546" y="103">Adaptive card approvals</text>
+
+        <!-- Power Automate -->
+        <rect class="pf-node" x="530" y="210" width="160" height="120" rx="10"/>
+        <text class="pf-eyebrow" x="546" y="236">ORCHESTRATE</text>
+        <text class="pf-title" x="546" y="257">Power Automate</text>
+        <text class="pf-sub" x="546" y="273">Scoring · routing · SLA</text>
+        <text class="pf-line" x="546" y="296">high risk → all approvers</text>
+        <text class="pf-line" x="546" y="310">low risk → privacy only</text>
+
+        <!-- Outlook -->
+        <rect class="pf-node-accent" x="530" y="426" width="160" height="84" rx="10"/>
+        <text class="pf-eyebrow" x="546" y="452">NOTIFY</text>
+        <text class="pf-title" x="546" y="473">Outlook</text>
+        <text class="pf-sub" x="546" y="489">Reminders &amp; escalations</text>
+
+        <!-- Power BI -->
+        <rect class="pf-node" x="790" y="210" width="160" height="120" rx="10"/>
+        <text class="pf-eyebrow" x="806" y="236">REPORT</text>
+        <text class="pf-title" x="806" y="257">Power BI</text>
+        <text class="pf-sub" x="806" y="273">Governance dashboards</text>
+        <text class="pf-line" x="806" y="296">risk · cycle times</text>
+        <text class="pf-line" x="806" y="310">model inventory</text>
+
+        <!-- 01 Submit: Power Apps -> Dataverse -->
+        <line class="pf-arrow" x1="190" y1="252" x2="264" y2="232" marker-end="url(#arr)"/>
+        <g><circle class="pf-badge-c" cx="227" cy="242" r="10"/><text class="pf-badge-t" x="227" y="245.5">01</text></g>
+
+        <!-- 02 Evidence: Power Apps -> SharePoint, refs -> Dataverse -->
+        <line class="pf-arrow" x1="110" y1="342" x2="110" y2="414" marker-end="url(#arr)"/>
+        <g><circle class="pf-badge-c" cx="110" cy="378" r="10"/><text class="pf-badge-t" x="110" y="381.5">02</text></g>
+        <line class="pf-arrow dashed" x1="196" y1="448" x2="288" y2="306" marker-end="url(#arr)"/>
+
+        <!-- 03 Trigger: Dataverse -> Power Automate -->
+        <line class="pf-arrow" x1="430" y1="235" x2="524" y2="248" marker-end="url(#arr)"/>
+        <g><circle class="pf-badge-c" cx="477" cy="241" r="10"/><text class="pf-badge-t" x="477" y="244.5">03</text></g>
+
+        <!-- 04 Approvals: Power Automate <-> Teams -->
+        <line class="pf-arrow" x1="588" y1="210" x2="588" y2="130" marker-end="url(#arr)"/>
+        <line class="pf-arrow" x1="632" y1="124" x2="632" y2="204" marker-end="url(#arr)"/>
+        <g><circle class="pf-badge-c" cx="610" cy="167" r="10"/><text class="pf-badge-t" x="610" y="170.5">04</text></g>
+
+        <!-- 04 Approvals: Power Automate <-> Outlook -->
+        <line class="pf-arrow" x1="588" y1="330" x2="588" y2="420" marker-end="url(#arr)"/>
+        <line class="pf-arrow" x1="632" y1="426" x2="632" y2="336" marker-end="url(#arr)"/>
+        <g><circle class="pf-badge-c" cx="610" cy="378" r="10"/><text class="pf-badge-t" x="610" y="381.5">04</text></g>
+
+        <!-- 05 Write-back: Power Automate -> Dataverse -->
+        <path class="pf-arrow" d="M530,308 C 495,336 470,336 438,302" marker-end="url(#arr)"/>
+        <g><circle class="pf-badge-c" cx="483" cy="329" r="10"/><text class="pf-badge-t" x="483" y="332.5">05</text></g>
+
+        <!-- 06 Live dataset: Dataverse -> Power BI (bottom route) -->
+        <path class="pf-arrow" d="M350,300 L350,545 L870,545 L870,336" marker-end="url(#arr)"/>
+        <g><circle class="pf-badge-c" cx="740" cy="545" r="10"/><text class="pf-badge-t" x="740" y="548.5">06</text></g>
+      </svg>
+
+      <div class="pf-legend">
+        <span><span class="n">01</span>Form submission creates the assessment record</span>
+        <span><span class="n">02</span>Evidence files land in SharePoint — references linked in Dataverse</span>
+        <span><span class="n">03</span>Flow triggers on the new record and calculates the risk score</span>
+        <span><span class="n">04</span>Approval requests go out via Teams cards and Outlook — decisions return to the flow</span>
+        <span><span class="n">05</span>Scores, approvals, and the audit log are written back</span>
+        <span><span class="n">06</span>Power BI reads the live dataset — no exports, no copies</span>
+      </div>
+    </div>
+
+    <p class="storage-note"><strong>Storage is a swappable layer:</strong> Dataverse is the system of record in this design, with SharePoint holding evidence files. The same pattern runs on SharePoint Lists for lighter-weight tenants without premium licensing, or on Azure SQL where scale and existing reporting infrastructure justify it — the flow logic and dashboards don't change, only the connector.</p>
+  </div>
+</section>
+
+<section id="dashboards">
+  <div class="wrap">
+    <div class="eyebrow">Dashboards</div>
+    <h2 style="font-size:30px; margin-bottom:32px;">What leadership sees</h2>
+    <div class="showcase">
+      <div class="showcase-head">
+        <div>
+          <h2>One dataset, three governance views</h2>
+          <p>Executive overview, working assessment tracker, and model inventory — all driven by the same Dataverse records. Click a <strong style="color:#fff;">Risk</strong> badge in the Tracker for the factor-level breakdown. All data shown is illustrative.</p>
+        </div>
+        <div class="view-tabs">
+          <div class="vtab active" data-view="d1">Overview</div>
+          <div class="vtab" data-view="d2">Tracker</div>
+          <div class="vtab" data-view="d3">Inventory</div>
+        </div>
+      </div>
+
+      <div class="screen">
+        <div class="dview active" id="d1">
+          <div class="kpi-row">
+            <div class="kpi"><div class="label">Avg Cycle Time</div><div class="value">4.2 days</div></div>
+            <div class="kpi"><div class="label">Models Tracked</div><div class="value">25</div></div>
+            <div class="kpi"><div class="label">Open Assessments</div><div class="value">7</div></div>
+            <div class="kpi"><div class="label">High Risk</div><div class="value">4</div></div>
+          </div>
+          <div class="two-col">
+            <div class="panel">
+              <h4>Risk distribution</h4>
+              <div class="dist-row"><span class="d-name">Low</span><div class="d-bar"><div style="width:82%; background:var(--green);"></div></div><span class="d-val">14</span></div>
+              <div class="dist-row"><span class="d-name">Medium</span><div class="d-bar"><div style="width:41%; background:var(--amber);"></div></div><span class="d-val">7</span></div>
+              <div class="dist-row"><span class="d-name">High</span><div class="d-bar"><div style="width:24%; background:var(--red);"></div></div><span class="d-val">4</span></div>
+            </div>
+            <div class="panel">
+              <h4>Approval bottlenecks — avg time to decision</h4>
+              <div class="dist-row"><span class="d-name">Privacy</span><div class="d-bar"><div style="width:25%; background:var(--teal);"></div></div><span class="d-val">12h</span></div>
+              <div class="dist-row"><span class="d-name">Security</span><div class="d-bar"><div style="width:75%; background:var(--teal);"></div></div><span class="d-val">36h</span></div>
+              <div class="dist-row"><span class="d-name">AI Gov.</span><div class="d-bar"><div style="width:100%; background:var(--teal-deep);"></div></div><span class="d-val">48h</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="dview" id="d2" style="position:relative;">
+          <table>
+            <thead><tr><th>Ref.</th><th>Use case</th><th>Business unit</th><th>Risk</th><th>Stage</th><th>Owner</th><th>Due</th></tr></thead>
+            <tbody id="trackerBody"></tbody>
+          </table>
+          <div class="risk-popover" id="riskPopover">
+            <div class="pop-arrow"></div>
+            <div class="pop-head">
+              <span class="pop-title">Factor breakdown</span>
+              <button class="pop-close" id="riskPopClose" aria-label="Close">✕</button>
+            </div>
+            <div id="riskPopBody"></div>
+          </div>
+        </div>
+
+        <div class="dview" id="d3">
+          <div class="two-col">
+            <div class="panel">
+              <h4>Model inventory by business unit</h4>
+              <div class="dist-row"><span class="d-name">Marketing</span><div class="d-bar"><div style="width:100%; background:var(--teal);"></div></div><span class="d-val">12</span></div>
+              <div class="dist-row"><span class="d-name">Operations</span><div class="d-bar"><div style="width:67%; background:var(--teal);"></div></div><span class="d-val">8</span></div>
+              <div class="dist-row"><span class="d-name">Finance</span><div class="d-bar"><div style="width:42%; background:var(--teal);"></div></div><span class="d-val">5</span></div>
+            </div>
+            <div class="panel">
+              <h4>Inventory by model type</h4>
+              <div class="dist-row"><span class="d-name">Classific.</span><div class="d-bar"><div style="width:100%; background:var(--teal-deep);"></div></div><span class="d-val">9</span></div>
+              <div class="dist-row"><span class="d-name">NLP / LLM</span><div class="d-bar"><div style="width:78%; background:var(--teal-deep);"></div></div><span class="d-val">7</span></div>
+              <div class="dist-row"><span class="d-name">Forecast</span><div class="d-bar"><div style="width:67%; background:var(--teal-deep);"></div></div><span class="d-val">6</span></div>
+              <div class="dist-row"><span class="d-name">Vision</span><div class="d-bar"><div style="width:33%; background:var(--teal-deep);"></div></div><span class="d-val">3</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="fade-bottom"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="data-model" class="glass-section">
+  <div class="ambient-orb" style="top:10%; right:-10%; width:480px; height:480px; background:linear-gradient(225deg, rgba(31,111,107,0.11), rgba(240,185,77,0.06));"></div>
+  <div class="wrap">
+    <div class="eyebrow">Data model</div>
+    <h2 style="font-size:30px;">One structured model in Dataverse — not six spreadsheets.</h2>
+    <p style="font-size:15.5px; color:var(--ink-2); margin-top:16px; max-width:680px;">Every assessment, score, approval, and mitigation action lives in a related table with enforced fields. That's what makes the audit trail automatic rather than an after-the-fact reconstruction — and it's why the dashboards never disagree with the record.</p>
+    <div class="model-grid">
+      <div class="model-card">
+        <div class="t-name">AI Use Case</div>
+        <div class="t-purpose">Metadata about the AI system, its purpose, and datasets</div>
+        <ul>
+          <li class="pk">UseCaseID</li><li>Name</li><li>Owner</li><li>ModelType</li><li>DatasetSources</li><li>IntendedUse</li>
+        </ul>
+      </div>
+      <div class="model-card">
+        <div class="t-name">Risk Factors</div>
+        <div class="t-purpose">Predefined criteria — privacy, bias, security, transparency</div>
+        <ul>
+          <li class="pk">FactorID</li><li>Name</li><li>Description</li><li>Weighting</li>
+        </ul>
+      </div>
+      <div class="model-card">
+        <div class="t-name">Risk Scores</div>
+        <div class="t-purpose">Calculated values per factor, per use case</div>
+        <ul>
+          <li class="pk">ScoreID</li><li>UseCaseID</li><li>FactorID</li><li>ScoreValue</li>
+        </ul>
+      </div>
+      <div class="model-card">
+        <div class="t-name">Assessment Record</div>
+        <div class="t-purpose">Full submission history with versioning</div>
+        <ul>
+          <li class="pk">AssessmentID</li><li>UseCaseID</li><li>SubmittedBy</li><li>SubmittedOn</li><li>Version</li><li>Status</li>
+        </ul>
+      </div>
+      <div class="model-card">
+        <div class="t-name">Stakeholder Approvals</div>
+        <div class="t-purpose">Decisions, timestamps, and comments per role</div>
+        <ul>
+          <li class="pk">ApprovalID</li><li>UseCaseID</li><li>Role</li><li>Decision</li><li>Timestamp</li><li>Comments</li>
+        </ul>
+      </div>
+      <div class="model-card">
+        <div class="t-name">Mitigation Actions</div>
+        <div class="t-purpose">Required controls, deadlines, and completion status</div>
+        <ul>
+          <li class="pk">ActionID</li><li>UseCaseID</li><li>Control</li><li>Deadline</li><li>Status</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="workflow" class="glass-section">
+  <div class="ambient-orb" style="top:15%; left:-12%; width:460px; height:460px; background:linear-gradient(135deg, rgba(31,111,107,0.10), rgba(240,185,77,0.07));"></div>
+  <div class="wrap">
+    <div class="eyebrow">Workflow logic</div>
+    <h2 style="font-size:30px;">The flow does the chasing, so people don't have to.</h2>
+    <div class="gov-flow">
+      <div class="gov-step">
+        <div class="gov-icon trigger">▶</div>
+        <h3>Trigger &amp; record</h3>
+        <p>A Power Apps submission creates the Assessment Record in Dataverse — nothing enters the process any other way.</p>
+      </div>
+      <div class="gov-arrow">→</div>
+      <div class="gov-step">
+        <div class="gov-icon score">Σ</div>
+        <h3>Score</h3>
+        <p>Scoring logic weighs model type, data sensitivity, and each risk factor into a single rating — the same way, every time.</p>
+      </div>
+      <div class="gov-arrow">→</div>
+      <div class="gov-step">
+        <div class="gov-icon route">⇄</div>
+        <h3>Route &amp; remind</h3>
+        <p>Approvals route by risk level, with automated reminders and escalation when an SLA is breached — no chasing by email.</p>
+      </div>
+      <div class="gov-arrow">→</div>
+      <div class="gov-step">
+        <div class="gov-icon log">⚑</div>
+        <h3>Finalise &amp; log</h3>
+        <p>A risk summary is generated, the audit log is stored, and the dashboards update — all from the same event.</p>
+      </div>
+    </div>
+    <div class="branch-note">
+      <span class="mono">CONDITION — HIGH RISK?</span><br>
+      <strong>Yes</strong> → route to all three stakeholders: Privacy → Security → AI Governance.&nbsp;
+      <strong>No</strong> → route to Privacy only. Routing runs parallel or sequential depending on risk level, so low-risk use cases aren't stuck in a queue built for high-risk ones.
+    </div>
+    <p style="font-size:15px; color:var(--ink-2); margin-top:36px; max-width:680px;"><strong>Built for audit from day one:</strong> immutable logs, versioned assessments, evidence attachments, and exportable audit packs — designed to support frameworks such as:</p>
+    <div class="fw-row">
+      <span class="tag">EU AI ACT</span>
+      <span class="tag">GDPR</span>
+      <span class="tag">ISO/IEC 42001</span>
+      <span class="tag">INTERNAL RESPONSIBLE AI POLICY</span>
+    </div>
+  </div>
+</section>
+
+<section id="impact">
+  <div class="wrap">
+    <div class="eyebrow">Impact</div>
+    <h2 style="font-size:30px;">What a workflow like this changes</h2>
+    <div class="impact-grid">
+      <div class="impact-card">
+        <div class="i-cat">Operational</div>
+        <div class="i-big"><span class="from">2 weeks</span>4 days</div>
+        <p>Assessment cycle time, with risk scoring standardised across teams and approvals tracked end to end.</p>
+      </div>
+      <div class="impact-card">
+        <div class="i-cat">Governance</div>
+        <div class="i-big">One inventory</div>
+        <p>A centralised register of every AI use case, real-time visibility of risk trends, and clear accountability per stakeholder.</p>
+      </div>
+      <div class="impact-card">
+        <div class="i-cat">Process</div>
+        <div class="i-big">Zero email chains</div>
+        <p>Manual documents and duplicated effort eliminated — one intake, one record, one report.</p>
+      </div>
+    </div>
+    <p class="modelled-note">Figures are modelled target outcomes for this concept design — illustrating the scale of improvement a workflow like this is built to deliver, not measured client results.</p>
+  </div>
+</section>
+
+<section id="stack" class="glass-section">
+  <div class="ambient-orb" style="top:20%; right:-8%; width:440px; height:440px; background:linear-gradient(225deg, rgba(31,111,107,0.10), rgba(240,185,77,0.06));"></div>
+  <div class="wrap">
+    <div class="eyebrow">Under the hood</div>
+    <h2 style="font-size:30px;">Platform components</h2>
+    <div class="stack-grid">
+      <div class="stack-card"><div class="cat">Intake</div><div class="item">Power Apps</div><div class="desc">Guided form with conditional logic — consistent capture for every AI use case.</div></div>
+      <div class="stack-card"><div class="cat">Data</div><div class="item">Dataverse</div><div class="desc">Six related tables holding use cases, scores, approvals, and mitigations.</div></div>
+      <div class="stack-card"><div class="cat">Automation</div><div class="item">Power Automate</div><div class="desc">Scoring, conditional routing, SLA reminders, escalation, and audit logging.</div></div>
+      <div class="stack-card"><div class="cat">Reporting</div><div class="item">Power BI</div><div class="desc">Risk distribution, cycle times, bottlenecks, and model inventory in real time.</div></div>
+    </div>
+  </div>
+</section>
+
+<section id="reflection">
+  <div class="wrap">
+    <div class="eyebrow">Reflection</div>
+    <h2 style="font-size:30px;">What designing this sharpened</h2>
+    <div class="reflect-grid">
+      <div class="reflect-card">
+        <h3>Centralise logic in the data layer</h3>
+        <p>Keeping scoring rules and risk factors in Dataverse — not hard-coded into individual flows — means one change propagates everywhere. The same lesson that shaped Regulation Inspector's config-driven taxonomy applies here.</p>
+      </div>
+      <div class="reflect-card">
+        <h3>Approval paths are a people problem first</h3>
+        <p>The hardest part isn't the flow — it's getting Privacy, Security, and AI Governance to agree on who decides what, in which order. Stakeholder workshops belong at the start of the build, not the end.</p>
+      </div>
+      <div class="reflect-card">
+        <h3>Risk scoring is never finished</h3>
+        <p>AI systems evolve after deployment, so a scoring model that's fixed at intake goes stale. The design assumes periodic reassessment as a first-class part of the workflow, not an exception.</p>
+      </div>
+      <div class="reflect-card">
+        <h3>Dashboards drive engagement</h3>
+        <p>Leadership doesn't read assessment records — they look at the risk distribution chart. Making governance visible is what turns it from a compliance chore into something the business actually steers by.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>AI Risk Assessment Workflow — a concept case study in process optimisation and responsible AI governance.</p>
+  <div class="flinks">
+    <a href="https://github.com/KennethEvb" target="_blank" rel="noopener">GitHub</a>
+    <a href="https://www.linkedin.com/in/kenneth-evbuomwan/" target="_blank" rel="noopener">LinkedIn</a>
+    <a href="#top">Back to top</a>
+  </div>
+</footer>
+
+<script>
+// Tracker rows — illustrative data only
+const cases = [
+  {ref:"UC-0029", name:"Credit Scoring Prototype", bu:"Finance", risk:"high", riskLabel:"High · 4.2", stage:"Mitigation actions open", owner:"A.D.", due:"05 Aug",
+    factors:{Privacy:5, Bias:5, Security:3, Transparency:4}, note:"High-risk path: routed to Privacy, Security, and AI Governance. Two mitigation actions outstanding before final approval."},
+  {ref:"UC-0042", name:"Customer Churn Model", bu:"Marketing", risk:"med", riskLabel:"Medium · 3.1", stage:"AI Governance review", owner:"M.T.", due:"24 Jul",
+    factors:{Privacy:4, Bias:3, Security:2, Transparency:3}, note:"Privacy and Security approved. Awaiting AI Governance decision — SLA reminder scheduled."},
+  {ref:"UC-0044", name:"CV Screening Assistant", bu:"HR", risk:"high", riskLabel:"High · 4.5", stage:"Privacy review", owner:"S.P.", due:"20 Jul",
+    factors:{Privacy:5, Bias:5, Security:3, Transparency:5}, note:"High-risk path: all three stakeholders required. Bias factor triggered enhanced review questions at intake."},
+  {ref:"UC-0045", name:"Customer Service Chatbot", bu:"Operations", risk:"med", riskLabel:"Medium · 2.8", stage:"Security review", owner:"L.V.", due:"28 Jul",
+    factors:{Privacy:3, Bias:2, Security:4, Transparency:2}, note:"Privacy approved. Security reviewing data retention configuration."},
+  {ref:"UC-0038", name:"Invoice OCR Extraction", bu:"Finance", risk:"low", riskLabel:"Low · 1.6", stage:"Approved", owner:"J.K.", due:"—",
+    factors:{Privacy:2, Bias:1, Security:2, Transparency:1}, note:"Low-risk path: Privacy-only review. Approved with no mitigation actions."},
+  {ref:"UC-0031", name:"Demand Forecasting", bu:"Operations", risk:"low", riskLabel:"Low · 1.4", stage:"Approved", owner:"R.M.", due:"—",
+    factors:{Privacy:1, Bias:1, Security:2, Transparency:2}, note:"Low-risk path: Privacy-only review. No personal data in scope."},
+];
+const sevClass = {high:"sev-high", med:"sev-med", low:"sev-low"};
+const fColor = v => v>=4 ? "var(--red)" : v>=3 ? "var(--amber)" : "var(--green)";
+
+document.getElementById('trackerBody').innerHTML = cases.map((c,i) => `
+  <tr><td class="mono">${c.ref}</td><td>${c.name}</td><td>${c.bu}</td>
+  <td><button class="sev sev-btn ${sevClass[c.risk]}" data-idx="${i}">${c.riskLabel}</button></td>
+  <td class="stage">${c.stage}</td><td>${c.owner}</td><td class="mono">${c.due}</td></tr>
+`).join('');
+
+const riskPopover = document.getElementById('riskPopover');
+const riskPopBody = document.getElementById('riskPopBody');
+
+function renderFactors(c){
+  return Object.entries(c.factors).map(([name,v]) => `
+    <div class="factor" style="grid-template-columns:90px 1fr 30px; margin-bottom:8px;">
+      <span class="f-name" style="font-size:12px;">${name}</span>
+      <div class="f-bar"><div style="width:${v*20}%; background:${fColor(v)};"></div></div>
+      <span class="f-score">${v}/5</span>
+    </div>
+  `).join('') + `<div class="pop-note">${c.note}</div>`;
+}
+
+document.querySelectorAll('.sev-btn').forEach(btn => {
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const wasOpenForThis = riskPopover.classList.contains('open') && riskPopover.dataset.idx === btn.dataset.idx;
+    if(wasOpenForThis){ riskPopover.classList.remove('open'); return; }
+    riskPopBody.innerHTML = renderFactors(cases[btn.dataset.idx]);
+    riskPopover.dataset.idx = btn.dataset.idx;
+    const container = document.getElementById('d2');
+    const containerRect = container.getBoundingClientRect();
+    const rect = btn.getBoundingClientRect();
+    let left = rect.left - containerRect.left;
+    let arrowLeft = 24;
+    if(left + 270 > containerRect.width){
+      const shift = (left + 280) - containerRect.width;
+      left = Math.max(8, left - shift);
+      arrowLeft = Math.min(240, (rect.left - containerRect.left - left) + 12);
+    }
+    riskPopover.style.top = (rect.bottom - containerRect.top) + 10 + 'px';
+    riskPopover.style.left = left + 'px';
+    riskPopover.querySelector('.pop-arrow').style.left = arrowLeft + 'px';
+    riskPopover.classList.add('open');
+  });
+});
+document.getElementById('riskPopClose').addEventListener('click', () => riskPopover.classList.remove('open'));
+document.addEventListener('click', (e) => {
+  if(!riskPopover.contains(e.target) && !e.target.closest('.sev-btn')) riskPopover.classList.remove('open');
+});
+document.addEventListener('keydown', (e) => { if(e.key === 'Escape') riskPopover.classList.remove('open'); });
+
+document.querySelectorAll('.vtab').forEach(t => t.addEventListener('click', () => {
+  document.querySelectorAll('.vtab').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.dview').forEach(x=>x.classList.remove('active'));
+  t.classList.add('active');
+  document.getElementById(t.dataset.view).classList.add('active');
+}));
+</script>
+
+</body>
+</html>

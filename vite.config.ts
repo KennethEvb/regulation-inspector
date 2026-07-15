@@ -5,6 +5,10 @@ import {defineConfig} from 'vite';
 
 export default defineConfig(() => {
   return {
+    base: '/interactive/',
+    build: {
+      outDir: 'dist/interactive',
+    },
     plugins: [react(), tailwindcss()],
     resolve: {
       alias: {

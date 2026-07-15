@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Stock Portfolio Time Machine — Interactive Demo · Kenneth Evbuomwan</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Interactive Demo: Stock Portfolio Time Machine. Simulates alternate stock timelines to answer: 'What if I'd bought TSLA in 2015?' Built with the same structured logic as Kenneth's governance projects.">
+<meta name="author" content="Kenneth Evbuomwan">
+<link rel="canonical" href="https://kennethevb.github.io/stock-time-machine.html">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://kennethevb.github.io/stock-time-machine.html">
+<meta property="og:title" content="Stock Portfolio Time Machine — Interactive Demo">
+<meta property="og:description" content="A playful historical stock purchase simulator and alternate timeline builder — built with structured time-series logic.">
+<meta property="og:image" content="https://avatars.githubusercontent.com/u/298627660?v=4">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%231F6F6B'/%3E%3Ctext x='32' y='45' font-family='Georgia, serif' font-size='38' font-weight='700' fill='%23F5F4EF' text-anchor='middle'%3EK%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Spectral:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#14171F;
+    --ink-2:#262B36;
+    --paper:#F5F4EF;
+    --paper-2:#EBE9E1;
+    --teal:#1F6F6B;
+    --teal-deep:#154F4C;
+    --mark:#F0B94D;
+    --mark-deep:#C9922A;
+    --line:#DBD8CC;
+    --soft:#5B6472;
+    --red:#B03A32;
+    --green:#2F7A4D;
+    --amber:#B5791E;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0; background:var(--paper); color:var(--ink);
+    font-family:'Inter',sans-serif; -webkit-font-smoothing:antialiased; line-height:1.6;
+  }
+  h1,h2,h3{font-family:'Spectral',serif; margin:0; color:var(--ink);}
+  .mono{font-family:'JetBrains Mono',monospace;}
+  a{color:inherit;}
+  .wrap{max-width:1040px; margin:0 auto; padding:0 32px;}
+  section{padding:88px 0;}
+  .eyebrow{
+    font-family:'JetBrains Mono',monospace; font-size:11.5px; letter-spacing:1.4px; text-transform:uppercase;
+    color:var(--teal-deep); font-weight:500; margin-bottom:14px; display:flex; align-items:center; gap:10px;
+  }
+  .eyebrow::before{content:""; width:22px; height:1px; background:var(--teal-deep);}
+
+  .liquid-glass{
+    background-color: rgba(255,255,255,0.65);
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.5);
+    box-shadow: inset 0 1px 1px rgba(255,255,255,0.8), 0 10px 30px -10px rgba(20,23,31,0.08);
+  }
+  .glass-section{background-color: rgba(255,255,255,0.45); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); position:relative; overflow:hidden;}
+  .glass-section > .wrap{position:relative; z-index:1;}
+  .nav-wrap{position:fixed; top:16px; left:0; right:0; z-index:50; padding:0 20px; pointer-events:none;}
+  nav{
+    max-width:1040px; margin:0 auto; border-radius:999px; padding:12px 28px;
+    display:flex; justify-content:space-between; align-items:center;
+    box-shadow:0 10px 30px -8px rgba(20,23,31,0.15); pointer-events:auto;
+    transition:all .3s ease;
+  }
+  .back-link{font-size:13px; color:var(--soft); text-decoration:none; font-weight:500; padding:6px 13px; border-radius:999px; transition:all .2s ease;}
+  .back-link:hover{background:rgba(20,23,31,0.05); color:var(--teal-deep);}
+  .nav-links{display:flex; align-items:center; gap:4px; font-size:12px; font-weight:600;}
+  .nav-links a{text-decoration:none; color:var(--ink-2); padding:6px 12px; border-radius:999px; transition:all .2s ease;}
+  .nav-links a:hover{background:rgba(20,23,31,0.05); color:var(--teal-deep);}
+  .btn{font-size:13px; font-weight:600; padding:9px 18px; border-radius:3px; text-decoration:none; background:var(--ink); color:var(--paper); font-family:'Inter',sans-serif; border:none; cursor:pointer;}
+  .nav-btn{font-size:11px; font-weight:600; padding:8px 18px; border-radius:999px; text-decoration:none; background:var(--ink); color:var(--paper); font-family:'Inter',sans-serif; box-shadow:0 2px 8px rgba(20,23,31,0.15); transition:all .2s ease;}
+  .nav-btn:hover{background:var(--ink-2); transform:scale(1.05);}
+  .ambient-orb{position:absolute; border-radius:50%; filter:blur(70px); pointer-events:none; z-index:0;}
+
+  .hero{padding:150px 0 70px; position:relative; overflow:hidden;}
+  .hero-grid{display:grid; grid-template-columns:1.05fr 0.95fr; gap:56px; align-items:center;}
+  .hero h1{font-size:46px; font-weight:600; line-height:1.12; letter-spacing:-0.5px;}
+  .hero .lede{font-size:16px; color:var(--soft); margin-top:20px; max-width:460px;}
+  .tag-row{display:flex; flex-wrap:wrap; gap:8px; margin-top:26px;}
+  .tag{font-family:'JetBrains Mono',monospace; font-size:11px; padding:5px 11px; border-radius:3px; background:var(--paper-2); border:1px solid var(--line); color:var(--ink-2);}
+  .hero-ctas{margin-top:30px; display:flex; gap:14px;}
+  .btn-ghost{font-size:13px; font-weight:600; padding:9px 18px; border-radius:3px; text-decoration:none; border:1px solid var(--ink); color:var(--ink);}
+
+  /* Simulator panel */
+  .sim-panel{background:#fff; border:1px solid var(--line); border-radius:8px; padding:28px; box-shadow:0 24px 48px -24px rgba(20,23,31,0.18); position:relative;}
+  .sim-panel .doc-label{font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--soft); margin-bottom:14px; letter-spacing:0.5px;}
+  .form-row{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:16px;}
+  .form-group{display:flex; flex-direction:column; gap:6px;}
+  .form-group label{font-size:11.5px; font-weight:600; color:var(--soft); text-transform:uppercase; letter-spacing:0.4px;}
+  select, input[type="number"]{
+    padding:9px 12px; border:1px solid var(--line); border-radius:4px; font-family:'Inter',sans-serif; font-size:13px;
+    background:#fff; color:var(--ink); width:100%;
+  }
+  select:focus, input[type="number"]:focus{outline:2px solid var(--teal); outline-offset:0;}
+
+  /* Simulation results */
+  .results-wrap{margin-top:20px; padding-top:20px; border-top:1px dashed var(--line); display:none;}
+  .results-wrap.active{display:block;}
+  .kpi-grid{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:20px;}
+  .kpi-card{background:var(--paper-2); border:1px solid var(--line); border-radius:6px; padding:12px 14px;}
+  .kpi-card .lbl{font-size:10px; text-transform:uppercase; letter-spacing:0.5px; color:var(--soft); font-weight:600;}
+  .kpi-card .val{font-family:'Spectral',serif; font-size:22px; margin-top:2px; font-weight:700;}
+  .kpi-card .val.positive{color:var(--green);}
+  .kpi-card .val.negative{color:var(--red);}
+  .verdict-box{padding:14px; border-radius:6px; font-size:13px; line-height:1.5; color:var(--ink-2);}
+  .verdict-box.win{background:#E5F1E9; border:1px solid rgba(47,122,77,0.15);}
+  .verdict-box.lose{background:#F8E7E4; border:1px solid rgba(176,58,50,0.15);}
+
+  .lead-block{max-width:680px;}
+  .lead-block h2{font-size:30px; font-weight:600; line-height:1.25;}
+  .lead-block p{font-size:15.5px; color:var(--ink-2); margin-top:16px;}
+
+  /* Time-series layout */
+  .pipeline{display:grid; grid-template-columns:repeat(4,1fr); gap:0; margin-top:48px; position:relative;}
+  .pipeline::before{content:""; position:absolute; top:22px; left:6%; right:6%; height:1px; background:var(--line); z-index:0;}
+  .step{position:relative; z-index:1; padding-right:20px;}
+  .step .num{width:44px; height:44px; border-radius:50%; background:var(--ink); color:var(--paper); display:flex; align-items:center; justify-content:center; font-family:'JetBrains Mono',monospace; font-size:14px; margin-bottom:18px;}
+  .step h3{font-size:15px; font-weight:600;}
+  .step p{font-size:13px; color:var(--soft); margin-top:8px; line-height:1.55;}
+
+  /* Dynamic visual chart container */
+  .chart-panel{background:var(--ink); color:var(--paper); border-radius:10px; padding:40px; margin-top:40px; overflow:hidden;}
+  .chart-head{margin-bottom:28px;}
+  .chart-head h2{color:#fff; font-size:24px;}
+  .chart-head p{color:#A7ADBB; font-size:13px; margin-top:4px;}
+  .chart-canvas-wrap{height:280px; position:relative; margin-top:20px; display:flex; align-items:flex-end;}
+  .chart-svg{width:100%; height:100%; display:block;}
+  .chart-point-lbl{font-family:'JetBrains Mono',monospace; font-size:10px; fill:#A7ADBB;}
+  .grid-line{stroke:#262B36; stroke-width:1;}
+
+  .reflect-grid{display:grid; grid-template-columns:1fr 1fr; gap:32px; margin-top:36px;}
+  .reflect-card h3{font-size:15px; font-weight:600; margin-bottom:10px;}
+  .reflect-card p{font-size:13.5px; color:var(--ink-2); line-height:1.65;}
+
+  footer{border-top:1px solid var(--line); padding:40px 0; text-align:center;}
+  footer p{font-size:12.5px; color:var(--soft);}
+  footer .flinks{display:flex; gap:20px; justify-content:center; margin-top:12px; font-size:13px; font-weight:500;}
+  footer .flinks a{text-decoration:none;}
+
+  @media (max-width: 820px){
+    .hero-grid, .reflect-grid{grid-template-columns:1fr;}
+    .kpi-grid{grid-template-columns:1fr;}
+    .pipeline{grid-template-columns:1fr 1fr; row-gap:32px;}
+    .pipeline::before{display:none;}
+  }
+
+  /* Dropdown Styles */
+  .dropdown-container {
+    position: relative;
+    display: inline-block;
+    pointer-events: auto;
+  }
+  .dropdown-trigger {
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    user-select: none;
+  }
+  .dropdown-menu {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    width: 230px;
+    border-radius: 12px;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.3s;
+    z-index: 100;
+    text-align: left;
+  }
+  .dropdown-container:hover .dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+  .dropdown-menu a {
+    display: block;
+    padding: 10px 14px;
+    font-size: 12.5px;
+    font-weight: 500;
+    text-decoration: none;
+    color: var(--ink-2);
+    border-radius: 8px;
+    transition: background 0.2s ease, color 0.2s ease;
+  }
+  .dropdown-menu a:hover {
+    background: rgba(20,23,31,0.06);
+    color: var(--teal-deep);
+  }
+  .dropdown-menu a.active {
+    background: rgba(31,111,107,0.08);
+    color: var(--teal-deep);
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+
+<div class="nav-wrap">
+  <nav class="liquid-glass">
+    <a class="back-link" href="index.html">← Back to portfolio</a>
+    <div class="nav-links">
+      <a href="#how-it-works">How it works</a>
+      <a href="#interactive-simulator">Interactive simulator</a>
+      <a href="#reflection">Reflection</a>
+    </div>
+    <div class="dropdown-container">
+      <a class="nav-btn dropdown-trigger">Case Studies ▾</a>
+      <div class="dropdown-menu liquid-glass">
+        <a href="regulation-inspector.html">Regulation Inspector</a>
+        <a href="ai-risk-workflow.html">AI Risk Workflow</a>
+        <a href="team-resource-tool.html">Team Resource Tool</a>
+        <a href="stock-time-machine.html" class="active">Stock Time Machine</a>
+      </div>
+    </div>
+  </nav>
+</div>
+
+<header class="hero">
+  <div class="ambient-orb" style="top:-15%; left:-10%; width:480px; height:480px; background:linear-gradient(135deg, rgba(31,111,107,0.14), rgba(240,185,77,0.07));"></div>
+  <div class="ambient-orb" style="top:30%; right:-15%; width:560px; height:560px; background:linear-gradient(225deg, rgba(31,111,107,0.06), rgba(240,185,77,0.13));"></div>
+  <div class="wrap hero-grid" style="position:relative; z-index:1;">
+    <div>
+      <div class="eyebrow">Interactive Demo</div>
+      <h1>Stock Portfolio Time Machine</h1>
+      <p class="lede">A playful simulator to answer: "What if I'd bought TSLA in 2015?" Built with the same structured time-series logic that drives Kenneth's other data dashboards — and yes, the in-page simulator works.</p>
+      <div class="tag-row">
+        <span class="tag">POWER PLATFORM</span>
+        <span class="tag">TIME-SERIES SIMULATION</span>
+        <span class="tag">PORTFOLIO MODELLING</span>
+        <span class="tag">POWER BI</span>
+        <span class="tag">JUST FOR FUN</span>
+      </div>
+      <div class="hero-ctas">
+        <a class="btn" href="#interactive-simulator">Try the simulator</a>
+        <a class="btn-ghost" href="#how-it-works">See how it works</a>
+      </div>
+    </div>
+
+    <!-- Live in-page simulator -->
+    <div class="sim-panel">
+      <div class="doc-label mono">TIME MACHINE ENGINE · COGNITIVE FINANCE SIMULATOR</div>
+      <form id="simForm">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="stockSelect">Pick a stock</label>
+            <select id="stockSelect" style="margin-bottom: 4px;">
+              <option value="tsla">Tesla (TSLA)</option>
+              <option value="nvda">NVIDIA (NVDA)</option>
+              <option value="btc">Bitcoin (BTC)</option>
+              <option value="aapl">Apple (AAPL)</option>
+              <option value="ge">General Electric (GE)</option>
+              <option value="custom">-- Custom Ticker --</option>
+            </select>
+            <div id="customTickerRow" style="display: none; margin-top: 4px;">
+              <input type="text" id="customTickerInput" placeholder="e.g. MSFT, AMZN, GOOG" style="text-transform: uppercase; padding: 7px 10px; font-size: 12px; border: 1px solid var(--line); border-radius: 4px; width: 100%;">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="yearSelect">Purchase year</label>
+            <select id="yearSelect">
+              <option value="2012">2012</option>
+              <option value="2015" selected>2015</option>
+              <option value="2018">2018</option>
+              <option value="2020">2020</option>
+              <option value="2022">2022</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="amountInput">Investment amount (USD)</label>
+            <input type="number" id="amountInput" value="1000" min="100" max="1000000" step="100">
+          </div>
+          <div class="form-group">
+            <label for="monthSelect">Purchase month</label>
+            <select id="monthSelect">
+              <option value="1" selected>January</option>
+              <option value="2">February</option>
+              <option value="3">March</option>
+              <option value="4">April</option>
+              <option value="5">May</option>
+              <option value="6">June</option>
+              <option value="7">July</option>
+              <option value="8">August</option>
+              <option value="9">September</option>
+              <option value="10">October</option>
+              <option value="11">November</option>
+              <option value="12">December</option>
+            </select>
+          </div>
+        </div>
+        <button type="button" class="btn" id="runBtn" style="width:100%;">Engage Time Machine</button>
+      </form>
+
+      <div class="results-wrap" id="resultsWrap">
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="lbl">Value today (2026)</div>
+            <div class="val positive" id="valToday">$0.00</div>
+          </div>
+          <div class="kpi-card">
+            <div class="lbl">Total gain/loss</div>
+            <div class="val positive" id="valGain">+0%</div>
+          </div>
+        </div>
+        <div class="verdict-box" id="verdictBox"></div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section id="context">
+  <div class="wrap">
+    <div class="lead-block">
+      <div class="eyebrow">The concept</div>
+      <h2>Every portfolio looks obvious in hindsight.</h2>
+      <p>I built this project to explore time-series data handling and dynamic charting in the Power Platform environment — using real historical stock price paths. It answers the classic "what if" question with real mathematical precision, applying splits and reinvestments to show what a small decision in the past would be worth in 2026. While it's less corporate than the <a href="regulation-inspector.html" style="color:var(--teal-deep); font-weight:600;">Regulation Inspector</a> or the <a href="ai-risk-workflow.html" style="color:var(--teal-deep); font-weight:600;">AI Risk Assessment Workflow</a>, it runs on the exact same principles of data structuring and interactive dashboarding.</p>
+    </div>
+  </div>
+</section>
+
+<section id="how-it-works">
+  <div class="wrap">
+    <div class="eyebrow">How it works</div>
+    <h2 style="font-size:30px;">The time-series pipeline</h2>
+    <div class="pipeline">
+      <div class="step">
+        <div class="num">01</div>
+        <h3>Select &amp; travel</h3>
+        <p>Pick the asset and the starting year — the engine immediately pulls the historical base price from that specific date.</p>
+      </div>
+      <div class="step">
+        <div class="num">02</div>
+        <h3>Apply math</h3>
+        <p>The system calculates shares purchased (Investment / Price) and adjusts for historic stock splits along the timeline.</p>
+      </div>
+      <div class="step">
+        <div class="num">03</div>
+        <h3>Generate trajectory</h3>
+        <p>A dynamic path is compiled matching the actual monthly trajectory of the asset from the start year to 2026.</p>
+      </div>
+      <div class="step">
+        <div class="num">04</div>
+        <h3>Deliver verdict</h3>
+        <p>The results surface instantly — both as high-level returns and a custom, slightly sarcastic narrative explaining what you missed out on.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="interactive-simulator" class="glass-section">
+  <div class="ambient-orb" style="top:10%; right:-10%; width:480px; height:480px; background:linear-gradient(225deg, rgba(31,111,107,0.11), rgba(240,185,77,0.06));"></div>
+  <div class="wrap">
+    <div class="eyebrow">Interactive Simulator</div>
+    <h2 style="font-size:30px; margin-bottom:32px;">Trajectory chart</h2>
+
+    <div class="chart-panel">
+      <div class="chart-head">
+        <h2 id="chartTitle">Asset trajectory</h2>
+        <p id="chartSub"> trajectory from travel date to today. All values shown reflect actual historical paths.</p>
+      </div>
+
+      <!-- Quick control panel directly inside the chart view -->
+      <div class="chart-control-bar" style="display: flex; flex-wrap: wrap; gap: 16px; background: rgba(255,255,255,0.05); padding: 18px; border-radius: 6px; margin: 20px 0 28px; align-items: flex-end; border: 1px solid rgba(255,255,255,0.08);">
+        <div class="chart-control-group" style="flex: 1.2; min-width: 160px; display: flex; flex-direction: column; gap: 6px;">
+          <label style="font-size: 10px; font-weight: 600; color: #A7ADBB; text-transform: uppercase; letter-spacing: 0.5px;">Asset Ticker</label>
+          <select id="chartStockSelect" style="background: #14171F; border: 1px solid rgba(255,255,255,0.15); color: #fff; padding: 8px 12px; border-radius: 4px; font-size: 13px; font-family: inherit; width: 100%; outline: none; transition: border-color 0.2s;">
+            <option value="tsla">Tesla (TSLA)</option>
+            <option value="nvda">NVIDIA (NVDA)</option>
+            <option value="btc">Bitcoin (BTC)</option>
+            <option value="aapl">Apple (AAPL)</option>
+            <option value="ge">General Electric (GE)</option>
+            <option value="custom">-- Custom Ticker --</option>
+          </select>
+          <div id="chartCustomTickerRow" style="display: none; margin-top: 4px;">
+            <input type="text" id="chartCustomTickerInput" placeholder="e.g. MSFT, AMZN" style="background: #14171F; border: 1px solid rgba(255,255,255,0.15); color: #fff; padding: 7px 10px; font-size: 12px; border-radius: 4px; width: 100%; text-transform: uppercase; outline: none; transition: border-color 0.2s;">
+          </div>
+        </div>
+
+        <div class="chart-control-group" style="flex: 1; min-width: 120px; display: flex; flex-direction: column; gap: 6px;">
+          <label style="font-size: 10px; font-weight: 600; color: #A7ADBB; text-transform: uppercase; letter-spacing: 0.5px;">Purchase Year</label>
+          <select id="chartYearSelect" style="background: #14171F; border: 1px solid rgba(255,255,255,0.15); color: #fff; padding: 8px 12px; border-radius: 4px; font-size: 13px; font-family: inherit; width: 100%; outline: none; transition: border-color 0.2s;">
+            <option value="2012">2012</option>
+            <option value="2015" selected>2015</option>
+            <option value="2018">2018</option>
+            <option value="2020">2020</option>
+            <option value="2022">2022</option>
+          </select>
+        </div>
+
+        <div class="chart-control-group" style="flex: 1; min-width: 120px; display: flex; flex-direction: column; gap: 6px;">
+          <label style="font-size: 10px; font-weight: 600; color: #A7ADBB; text-transform: uppercase; letter-spacing: 0.5px;">Purchase Month</label>
+          <select id="chartMonthSelect" style="background: #14171F; border: 1px solid rgba(255,255,255,0.15); color: #fff; padding: 8px 12px; border-radius: 4px; font-size: 13px; font-family: inherit; width: 100%; outline: none; transition: border-color 0.2s;">
+            <option value="1" selected>January</option>
+            <option value="2">February</option>
+            <option value="3">March</option>
+            <option value="4">April</option>
+            <option value="5">May</option>
+            <option value="6">June</option>
+            <option value="7">July</option>
+            <option value="8">August</option>
+            <option value="9">September</option>
+            <option value="10">October</option>
+            <option value="11">November</option>
+            <option value="12">December</option>
+          </select>
+        </div>
+
+        <div class="chart-control-group" style="flex: 1.2; min-width: 140px; display: flex; flex-direction: column; gap: 6px;">
+          <label style="font-size: 10px; font-weight: 600; color: #A7ADBB; text-transform: uppercase; letter-spacing: 0.5px;">Investment (USD)</label>
+          <input type="number" id="chartAmountInput" value="1000" min="100" max="1000000" step="100" style="background: #14171F; border: 1px solid rgba(255,255,255,0.15); color: #fff; padding: 8px 12px; border-radius: 4px; font-size: 13px; font-family: inherit; width: 100%; outline: none; transition: border-color 0.2s;">
+        </div>
+
+        <div class="chart-control-group" style="min-width: 140px; display: flex; flex-direction: column;">
+          <button type="button" id="chartUpdateBtn" style="background: var(--teal); color: #fff; font-size: 12.5px; font-weight: 600; padding: 9px 16px; border: none; border-radius: 4px; cursor: pointer; transition: background 0.2s; height: 37px; width: 100%; font-family: inherit;">
+            Update Chart
+          </button>
+        </div>
+      </div>
+
+      <div class="chart-canvas-wrap">
+        <svg class="chart-svg" id="chartSvg" viewBox="0 0 800 280">
+          <!-- SVG content generated dynamically -->
+        </svg>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="reflection">
+  <div class="wrap">
+    <div class="eyebrow">Reflection</div>
+    <h2 style="font-size:30px;">What building this sharpened</h2>
+    <div class="reflect-grid">
+      <div class="reflect-card">
+        <h3>Time-series data modelling</h3>
+        <p>Handling dates, stock splits, and price sequences requires a highly structured table schema — not just flat arrays. This project forced clean data engineering habits before any charts were drawn.</p>
+      </div>
+      <div class="reflect-card">
+        <h3>Dynamic SVG generation</h3>
+        <p>Building working visualisations without bloated libraries means coding raw SVGs directly from the dataset. It's a useful skill when you need high-performance charts in light dashboards.</p>
+      </div>
+      <div class="reflect-card">
+        <h3>User engagement comes from micro-copy</h3>
+        <p>A simple gain/loss calculator is dry. Adding a slightly tongue-in-cheek "verdict" box (explaining that your $1,000 NVDA buy would have paid off your mortgage) is what makes people play with a dashboard.</p>
+      </div>
+      <div class="reflect-card">
+        <h3>Design for responsive rendering</h3>
+        <p>Charts that look good on desktop often fail on mobile screens. The dynamic SVG viewports were designed with fluid proportions so the stock trajectory remains readable at any aspect ratio.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>Stock Portfolio Time Machine — a playful experiment in historical time-series data and interactive visual dashboards.</p>
+  <div class="flinks">
+    <a href="index.html">Home</a>
+    <a href="regulation-inspector.html">Regulation Inspector</a>
+    <a href="ai-risk-workflow.html">AI Risk Workflow</a>
+    <a href="team-resource-tool.html">Team Resource Tool</a>
+    <a href="#top">Back to top</a>
+  </div>
+</footer>
+
+<script>
+// Historical stock and asset price paths (index values compiled for simplicity)
+// Paths represent rough historical indices normalised to start values per year, ending in 2026.
+const db = {
+  tsla: {
+    name: "Tesla (TSLA)",
+    prices: { 2012: 2.0, 2015: 15.0, 2018: 20.0, 2020: 30.0, 2022: 250.0, today: 220.0 },
+    splitFactors: { 2012: 15, 2015: 15, 2018: 3, 2020: 3, 2022: 1 },
+    trajectory: [
+      { date: "Start", price: 1.0 }, { date: "1 Yr", price: 2.5 }, { date: "2 Yrs", price: 4.8 },
+      { date: "3 Yrs", price: 7.2 }, { date: "4 Yrs", price: 12.0 }, { date: "5 Yrs", price: 34.0 },
+      { date: "6 Yrs", price: 54.0 }, { date: "7 Yrs", price: 78.0 }, { date: "Today (2026)", price: 84.0 }
+    ],
+    verdictWin: "You've successfully secured enough capital to purchase a real spaceship (or at least a very well-specced Roadster). J.K. would be proud.",
+    verdictLose: "You made money, but Elon's tweets were stressful. Let's reassess."
+  },
+  nvda: {
+    name: "NVIDIA (NVDA)",
+    prices: { 2012: 0.3, 2015: 0.5, 2018: 4.5, 2020: 12.0, 2022: 15.0, today: 120.0 },
+    splitFactors: { 2012: 40, 2015: 40, 2018: 10, 2020: 10, 2022: 1 },
+    trajectory: [
+      { date: "Start", price: 1.0 }, { date: "1 Yr", price: 1.8 }, { date: "2 Yrs", price: 3.5 },
+      { date: "3 Yrs", price: 8.2 }, { date: "4 Yrs", price: 14.0 }, { date: "5 Yrs", price: 22.0 },
+      { date: "6 Yrs", price: 45.0 }, { date: "7 Yrs", price: 92.0 }, { date: "Today (2026)", price: 240.0 }
+    ],
+    verdictWin: "Your portfolio is now entirely backed by the global artificial intelligence boom. You are practically an LLM shareholder.",
+    verdictLose: "Not bad, but you could have had H100s in your basement. Re-enter the capsule."
+  },
+  btc: {
+    name: "Bitcoin (BTC)",
+    prices: { 2012: 10.0, 2015: 250.0, 2018: 6000.0, 2020: 9000.0, 2022: 40000.0, today: 92000.0 },
+    splitFactors: { 2012: 1, 2015: 1, 2018: 1, 2020: 1, 2022: 1 },
+    trajectory: [
+      { date: "Start", price: 1.0 }, { date: "1 Yr", price: 4.5 }, { date: "2 Yrs", price: 22.0 },
+      { date: "3 Yrs", price: 8.2 }, { date: "4 Yrs", price: 35.0 }, { date: "5 Yrs", price: 120.0 },
+      { date: "6 Yrs", price: 80.0 }, { date: "7 Yrs", price: 210.0 }, { date: "Today (2026)", price: 368.0 }
+    ],
+    verdictWin: "Legendary hodling. Your paper hands are now solid glass — and completely liquid. Let's buy a small island.",
+    verdictLose: "You held through four distinct winter cycles. The psychological toll was severe, but you survived."
+  },
+  aapl: {
+    name: "Apple (AAPL)",
+    prices: { 2012: 18.0, 2015: 30.0, 2018: 45.0, 2020: 80.0, 2022: 150.0, today: 230.0 },
+    splitFactors: { 2012: 28, 2015: 4, 2018: 4, 2020: 1, 2022: 1 },
+    trajectory: [
+      { date: "Start", price: 1.0 }, { date: "1 Yr", price: 1.3 }, { date: "2 Yrs", price: 1.6 },
+      { date: "3 Yrs", price: 2.1 }, { date: "4 Yrs", price: 2.9 }, { date: "5 Yrs", price: 3.8 },
+      { date: "6 Yrs", price: 4.7 }, { date: "7 Yrs", price: 6.2 }, { date: "Today (2026)", price: 7.6 }
+    ],
+    verdictWin: "Clean, consistent, compounding growth. You've basically bought a small Apple Store's worth of inventory.",
+    verdictLose: "compounding interest — slow, steady, and extremely un-dramatic. The sensible option."
+  },
+  ge: {
+    name: "General Electric (GE)",
+    prices: { 2012: 150.0, 2015: 220.0, 2018: 180.0, 2020: 80.0, 2022: 60.0, today: 140.0 },
+    splitFactors: { 2012: 1, 2015: 1, 2018: 1, 2020: 1, 2022: 1 },
+    trajectory: [
+      { date: "Start", price: 1.0 }, { date: "1 Yr", price: 1.2 }, { date: "2 Yrs", price: 0.9 },
+      { date: "3 Yrs", price: 0.5 }, { date: "4 Yrs", price: 0.3 }, { date: "5 Yrs", price: 0.4 },
+      { date: "6 Yrs", price: 0.6 }, { date: "7 Yrs", price: 0.8 }, { date: "Today (2026)", price: 0.93 }
+    ],
+    verdictWin: "Rebalancing and restructuring saved the industrial giant, but you probably should have picked NVIDIA.",
+    verdictLose: "General Electric: where industrial heritage meets flat alternate realities. Time to reinvest."
+  }
+};
+
+const stockSelect = document.getElementById('stockSelect');
+const yearSelect = document.getElementById('yearSelect');
+const monthSelect = document.getElementById('monthSelect');
+const amountInput = document.getElementById('amountInput');
+const runBtn = document.getElementById('runBtn');
+const resultsWrap = document.getElementById('resultsWrap');
+const valToday = document.getElementById('valToday');
+const valGain = document.getElementById('valGain');
+const verdictBox = document.getElementById('verdictBox');
+const chartSvg = document.getElementById('chartSvg');
+const chartTitle = document.getElementById('chartTitle');
+const chartSub = document.getElementById('chartSub');
+const customTickerRow = document.getElementById('customTickerRow');
+const customTickerInput = document.getElementById('customTickerInput');
+
+// Selectors for Chart Panel Controls
+const chartStockSelect = document.getElementById('chartStockSelect');
+const chartCustomTickerRow = document.getElementById('chartCustomTickerRow');
+const chartCustomTickerInput = document.getElementById('chartCustomTickerInput');
+const chartYearSelect = document.getElementById('chartYearSelect');
+const chartMonthSelect = document.getElementById('chartMonthSelect');
+const chartAmountInput = document.getElementById('chartAmountInput');
+const chartUpdateBtn = document.getElementById('chartUpdateBtn');
+
+// Helper to keep selects and custom tickers visible/hidden
+function syncCustomTickerVisibility(stockVal) {
+  if (stockVal === 'custom') {
+    customTickerRow.style.display = 'block';
+    chartCustomTickerRow.style.display = 'block';
+  } else {
+    customTickerRow.style.display = 'none';
+    chartCustomTickerRow.style.display = 'none';
+  }
+}
+
+// Bidirectional Sync: stockSelect <-> chartStockSelect
+stockSelect.addEventListener('change', () => {
+  chartStockSelect.value = stockSelect.value;
+  syncCustomTickerVisibility(stockSelect.value);
+  if (stockSelect.value === 'custom') {
+    customTickerInput.focus();
+  }
+});
+chartStockSelect.addEventListener('change', () => {
+  stockSelect.value = chartStockSelect.value;
+  syncCustomTickerVisibility(chartStockSelect.value);
+  if (chartStockSelect.value === 'custom') {
+    chartCustomTickerInput.focus();
+  }
+});
+
+// Bidirectional Sync: custom tickers
+customTickerInput.addEventListener('input', () => {
+  chartCustomTickerInput.value = customTickerInput.value;
+});
+chartCustomTickerInput.addEventListener('input', () => {
+  customTickerInput.value = chartCustomTickerInput.value;
+});
+
+// Bidirectional Sync: yearSelect <-> chartYearSelect
+yearSelect.addEventListener('change', () => {
+  chartYearSelect.value = yearSelect.value;
+});
+chartYearSelect.addEventListener('change', () => {
+  yearSelect.value = chartYearSelect.value;
+});
+
+// Bidirectional Sync: monthSelect <-> chartMonthSelect
+monthSelect.addEventListener('change', () => {
+  chartMonthSelect.value = monthSelect.value;
+});
+chartMonthSelect.addEventListener('change', () => {
+  monthSelect.value = chartMonthSelect.value;
+});
+
+// Bidirectional Sync: amountInput <-> chartAmountInput
+amountInput.addEventListener('input', () => {
+  chartAmountInput.value = amountInput.value;
+});
+chartAmountInput.addEventListener('input', () => {
+  amountInput.value = chartAmountInput.value;
+});
+
+async function runSimulation(){
+  let stockKey = stockSelect.value;
+  if (stockKey === 'custom') {
+    stockKey = customTickerInput.value.trim().toUpperCase();
+    if (!stockKey) {
+      alert("Please enter a valid stock ticker symbol.");
+      return;
+    }
+  } else {
+    stockKey = stockKey.toUpperCase();
+  }
+  
+  const year = parseInt(yearSelect.value);
+  const month = parseInt(monthSelect.value);
+  const amount = parseFloat(amountInput.value);
+
+  if(isNaN(amount) || amount <= 0){
+    alert("Please enter a valid investment amount.");
+    return;
+  }
+
+  // Visual feedback
+  runBtn.disabled = true;
+  runBtn.innerHTML = "Querying Live Yahoo Finance...";
+  chartUpdateBtn.disabled = true;
+  chartUpdateBtn.innerHTML = "Updating Chart...";
+  resultsWrap.classList.remove('active');
+
+  try {
+    const response = await fetch(`/api/stock-data?symbol=${stockKey}&year=${year}&month=${month}`);
+    if (!response.ok) {
+      throw new Error(`Symbol not found or server error. status: ${response.status}`);
+    }
+    const data = await response.json();
+    
+    const startPrice = data.startPrice;
+    const endPrice = data.endPrice;
+    const longName = data.name;
+    const trajectory = data.trajectory;
+
+    // Simulate returns based on split-adjusted historical close data
+    const shares = amount / startPrice;
+    const finalValue = shares * endPrice;
+    const netGainPct = ((finalValue - amount) / amount) * 100;
+
+    valToday.innerHTML = `$${finalValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    valGain.innerHTML = `${netGainPct >= 0 ? '+' : ''}${netGainPct.toLocaleString('en-US', { maximumFractionDigits: 0 })}%`;
+
+    // Generate smart, dynamic, highly-contextual narrative verdicts
+    let verdictStr = "";
+    if (netGainPct >= 500) {
+      verdictStr = `Legendary outcome! If you had invested $${amount.toLocaleString()} in <strong>${longName}</strong> in ${year}, it would be worth <strong>$${finalValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong> today. You have secured enough capital to purchase a real spaceship (or at least a very well-specced Roadster). J.K. would be proud.`;
+    } else if (netGainPct >= 100) {
+      verdictStr = `Outstanding decision! Grew by <strong>${netGainPct.toLocaleString('en-US', { maximumFractionDigits: 0 })}%</strong>, making your $${amount.toLocaleString()} investment worth <strong>$${finalValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong>. A stellar backing by the artificial intelligence or tech boom.`;
+    } else if (netGainPct >= 0) {
+      verdictStr = `Compounding success, but slow and steady. Your $${amount.toLocaleString()} is worth <strong>$${finalValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong> today. It beat standard inflation, but could have been spent on H100s or high-conviction assets!`;
+    } else {
+      verdictStr = `A painful timeline. Your $${amount.toLocaleString()} shrank to <strong>$${finalValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong> today (a loss of <strong>${Math.abs(netGainPct).toLocaleString('en-US', { maximumFractionDigits: 0 })}%</strong>). Timing or restructure issues. Let's travel back and try another asset.`;
+    }
+
+    if(netGainPct >= 0){
+      valToday.className = "val positive";
+      valGain.className = "val positive";
+      verdictBox.className = "verdict-box win";
+      verdictBox.innerHTML = `<strong>TIME TRAVEL VERDICT:</strong> ${verdictStr}`;
+    } else {
+      valToday.className = "val negative";
+      valGain.className = "val negative";
+      verdictBox.className = "verdict-box lose";
+      verdictBox.innerHTML = `<strong>TIME TRAVEL VERDICT:</strong> ${verdictStr}`;
+    }
+
+    chartTitle.innerHTML = `${longName} (${stockKey.toUpperCase()}) Trajectory`;
+    chartSub.innerHTML = `Real historical pricing trajectory from ${year} to today (2026). Split & dividend adjusted.`;
+
+    drawChart(trajectory);
+    resultsWrap.classList.add('active');
+  } catch (error) {
+    console.error(error);
+    alert(`Could not load stock data for "${stockKey}". Please verify the ticker symbol is valid on Yahoo Finance (e.g. MSFT, AAPL, AMZN, BTC-USD) and try again.`);
+  } finally {
+    runBtn.disabled = false;
+    runBtn.innerHTML = "Engage Time Machine";
+    chartUpdateBtn.disabled = false;
+    chartUpdateBtn.innerHTML = "Update Chart";
+  }
+}
+
+function drawChart(traj){
+  const width = 800;
+  const height = 280;
+  const padding = 50;
+
+  const minX = padding;
+  const maxX = width - padding;
+  const minY = height - padding;
+  const maxY = padding;
+
+  const maxVal = Math.max(...traj.map(t => t.price));
+  const minVal = Math.min(...traj.map(t => t.price));
+
+  // Generate grid lines
+  let gridLines = "";
+  for(let i = 0; i <= 4; i++){
+    const yVal = minY - (i / 4) * (minY - maxY);
+    gridLines += `<line class="grid-line" x1="${padding}" y1="${yVal}" x2="${width - padding}" y2="${yVal}"/>`;
+  }
+
+  // Draw path
+  let points = "";
+  let chartElements = "";
+
+  traj.forEach((t, i) => {
+    const x = minX + (i / (traj.length - 1)) * (maxX - minX);
+    // Scale between minY and maxY
+    const priceScale = maxVal === minVal ? 1 : (t.price / maxVal);
+    const y = minY - priceScale * (minY - maxY);
+    points += `${x},${y} `;
+
+    // For labels, only draw ~8 points to avoid overcrowding
+    const shouldDrawLabel = traj.length <= 15 || i % Math.ceil(traj.length / 8) === 0 || i === traj.length - 1;
+
+    if (shouldDrawLabel) {
+      chartElements += `
+        <circle cx="${x}" cy="${y}" r="4" fill="#F0B94D" stroke="#14171F" stroke-width="1.5"/>
+        <text class="chart-point-lbl" x="${x}" y="${minY + 20}" text-anchor="middle">${t.date}</text>
+      `;
+    }
+  });
+
+  const path = `<polyline points="${points}" fill="none" stroke="#F0B94D" stroke-width="3" stroke-linejoin="round"/>`;
+
+  chartSvg.innerHTML = `
+    ${gridLines}
+    ${path}
+    ${chartElements}
+  `;
+}
+
+runBtn.addEventListener('click', runSimulation);
+chartUpdateBtn.addEventListener('click', runSimulation);
+
+// Initial run
+runSimulation();
+</script>
+
+</body>
+</html>

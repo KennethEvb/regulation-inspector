@@ -52,7 +52,7 @@ The application is a single-screen full-featured Single Page Application (SPA):
 ### D. AI Document Intake Hub (AI Intake Hub Tab)
 *   **Drag-and-Drop Uploader**: Fully functional dragging, dropping, or manual file selection trigger interface.
 *   **Real-time Name Binding**: Replaces hardcoded references. When any custom security guideline, contract, or audit PDF is uploaded, the OCR simulation, console log, audit certificates, and mapped results bind directly to the **actual filename** and **file size** of the uploaded document.
-*   **Sandbox Quick Scanner**: Includes a pre-bundled *Barclays Supplier Info & Cyber Security Standard* sample to let users experience immediate auto-scanning.
+*   **Sandbox Quick Scanner**: Lets users select any uploaded document to experience immediate auto-scanning (no hardcoded named sample).
 *   **Impact mapping**: Successfully aligns clauses related to DORA Art. 28(4) (Contractual Exit & Audit), BAIT Sec. 8.2 (Subcontracting Flow-downs), and BAIT Sec. 7.2.1 (Vulnerability and Pen-testing) into the global Gaps register as **Covered (AI Assessed)**.
 
 ---

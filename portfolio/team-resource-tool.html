@@ -1,0 +1,1247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Team Management &amp; Resource Allocation Tool — Case Study · Kenneth Evbuomwan</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Concept case study: a Team Management &amp; Resource Allocation Tool on the Microsoft Power Platform — IAM integration, FTE forecasting, and dynamic scaling from a manual MVP to an enterprise JIRA-connected system.">
+<meta name="author" content="Kenneth Evbuomwan">
+<link rel="canonical" href="https://kennethevb.github.io/team-resource-tool.html">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://kennethevb.github.io/team-resource-tool.html">
+<meta property="og:title" content="Team Management &amp; Resource Allocation Tool — Case Study">
+<meta property="og:description" content="Scaling a resource planner from manual MVP to enterprise JIRA integration — with full IAM sync and FTE forecasting.">
+<meta property="og:image" content="https://avatars.githubusercontent.com/u/298627660?v=4">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%231F6F6B'/%3E%3Ctext x='32' y='45' font-family='Georgia, serif' font-size='38' font-weight='700' fill='%23F5F4EF' text-anchor='middle'%3EK%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Spectral:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#14171F;
+    --ink-2:#262B36;
+    --paper:#F5F4EF;
+    --paper-2:#EBE9E1;
+    --teal:#1F6F6B;
+    --teal-deep:#154F4C;
+    --mark:#F0B94D;
+    --mark-deep:#C9922A;
+    --line:#DBD8CC;
+    --soft:#5B6472;
+    --red:#B03A32;
+    --green:#2F7A4D;
+    --amber:#B5791E;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0; background:var(--paper); color:var(--ink);
+    font-family:'Inter',sans-serif; -webkit-font-smoothing:antialiased; line-height:1.6;
+  }
+  h1,h2,h3{font-family:'Spectral',serif; margin:0; color:var(--ink);}
+  .mono{font-family:'JetBrains Mono',monospace;}
+  a{color:inherit;}
+  .wrap{max-width:1040px; margin:0 auto; padding:0 32px;}
+  section{padding:88px 0;}
+  .eyebrow{
+    font-family:'JetBrains Mono',monospace; font-size:11.5px; letter-spacing:1.4px; text-transform:uppercase;
+    color:var(--teal-deep); font-weight:500; margin-bottom:14px; display:flex; align-items:center; gap:10px;
+  }
+  .eyebrow::before{content:""; width:22px; height:1px; background:var(--teal-deep);}
+
+  .liquid-glass{
+    background-color: rgba(255,255,255,0.65);
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.5);
+    box-shadow: inset 0 1px 1px rgba(255,255,255,0.8), 0 10px 30px -10px rgba(20,23,31,0.08);
+  }
+  .glass-section{background-color: rgba(255,255,255,0.45); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); position:relative; overflow:hidden;}
+  .glass-section > .wrap{position:relative; z-index:1;}
+  .nav-wrap{position:fixed; top:16px; left:0; right:0; z-index:50; padding:0 20px; pointer-events:none;}
+  nav{
+    max-width:1040px; margin:0 auto; border-radius:999px; padding:12px 28px;
+    display:flex; justify-content:space-between; align-items:center;
+    box-shadow:0 10px 30px -8px rgba(20,23,31,0.15); pointer-events:auto;
+    transition:all .3s ease;
+  }
+  .back-link{font-size:13px; color:var(--soft); text-decoration:none; font-weight:500; padding:6px 13px; border-radius:999px; transition:all .2s ease;}
+  .back-link:hover{background:rgba(20,23,31,0.05); color:var(--teal-deep);}
+  .nav-links{display:flex; align-items:center; gap:4px; font-size:12px; font-weight:600;}
+  .nav-links a{text-decoration:none; color:var(--ink-2); padding:6px 12px; border-radius:999px; transition:all .2s ease;}
+  .nav-links a:hover{background:rgba(20,23,31,0.05); color:var(--teal-deep);}
+  .btn{font-size:13px; font-weight:600; padding:9px 18px; border-radius:3px; text-decoration:none; background:var(--ink); color:var(--paper); font-family:'Inter',sans-serif;}
+  .nav-btn{font-size:11px; font-weight:600; padding:8px 18px; border-radius:999px; text-decoration:none; background:var(--ink); color:var(--paper); font-family:'Inter',sans-serif; box-shadow:0 2px 8px rgba(20,23,31,0.15); transition:all .2s ease;}
+  .nav-btn:hover{background:var(--ink-2); transform:scale(1.05);}
+  .ambient-orb{position:absolute; border-radius:50%; filter:blur(70px); pointer-events:none; z-index:0;}
+
+  .hero{padding:150px 0 70px; position:relative; overflow:hidden;}
+  .hero-grid{display:grid; grid-template-columns:1.05fr 0.95fr; gap:56px; align-items:center;}
+  .hero h1{font-size:46px; font-weight:600; line-height:1.12; letter-spacing:-0.5px;}
+  .hero .lede{font-size:16px; color:var(--soft); margin-top:20px; max-width:460px;}
+  .tag-row{display:flex; flex-wrap:wrap; gap:8px; margin-top:26px;}
+  .tag{font-family:'JetBrains Mono',monospace; font-size:11px; padding:5px 11px; border-radius:3px; background:var(--paper-2); border:1px solid var(--line); color:var(--ink-2);}
+  .hero-ctas{margin-top:30px; display:flex; gap:14px;}
+  .btn-ghost{font-size:13px; font-weight:600; padding:9px 18px; border-radius:3px; text-decoration:none; border:1px solid var(--ink); color:var(--ink);}
+
+  /* Hero simulation card */
+  .sim-card{background:#fff; border:1px solid var(--line); border-radius:6px; padding:26px 28px; box-shadow:0 24px 48px -24px rgba(20,23,31,0.18); position:relative;}
+  .sim-card .doc-label{font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--soft); margin-bottom:14px; letter-spacing:0.4px;}
+  .sim-card h3{font-size:20px; font-weight:600; margin-bottom:4px;}
+  .sim-card .desc{font-size:12.5px; color:var(--soft); margin-bottom:20px;}
+  .mode-switch-wrap{display:flex; justify-content:space-between; align-items:center; background:var(--paper-2); border:1px solid var(--line); border-radius:6px; padding:10px 14px; margin-bottom:20px;}
+  .mode-switch-wrap .label{font-size:12px; font-weight:600; color:var(--ink-2);}
+  .switch-row{display:flex; gap:4px; background:rgba(20,23,31,0.05); padding:3px; border-radius:20px;}
+  .switch-btn{font-size:10.5px; font-weight:600; border:none; background:none; color:var(--soft); padding:4px 12px; border-radius:15px; cursor:pointer;}
+  .switch-btn.active{background:#fff; color:var(--ink); box-shadow:0 1px 4px rgba(20,23,31,0.1);}
+  .panel-body{font-size:13px; color:var(--ink-2); line-height:1.6;}
+  .panel-body strong{color:var(--ink);}
+  .panel-body ul{margin:10px 0 0; padding-left:18px;}
+  .panel-body li{margin-bottom:6px;}
+
+  .lead-block{max-width:680px;}
+  .lead-block h2{font-size:30px; font-weight:600; line-height:1.25;}
+  .lead-block p{font-size:15.5px; color:var(--ink-2); margin-top:16px;}
+
+  .pipeline{display:grid; grid-template-columns:repeat(4,1fr); gap:0; margin-top:48px; position:relative;}
+  .pipeline::before{content:""; position:absolute; top:22px; left:6%; right:6%; height:1px; background:var(--line); z-index:0;}
+  .step{position:relative; z-index:1; padding-right:20px;}
+  .step .num{width:44px; height:44px; border-radius:50%; background:var(--ink); color:var(--paper); display:flex; align-items:center; justify-content:center; font-family:'JetBrains Mono',monospace; font-size:14px; margin-bottom:18px;}
+  .step h3{font-size:15px; font-weight:600;}
+  .step p{font-size:13px; color:var(--soft); margin-top:8px; line-height:1.55;}
+
+  .showcase{background:var(--ink); color:var(--paper); border-radius:10px; padding:44px 44px 0; overflow:hidden;}
+  .showcase-head{display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:28px; flex-wrap:wrap; gap:16px;}
+  .showcase-head h2{color:#fff; font-size:26px;}
+  .showcase-head p{color:#A7ADBB; font-size:13.5px; max-width:420px; margin-top:8px;}
+  .view-tabs{display:flex; gap:6px;}
+  .vtab{font-size:12.5px; font-weight:500; padding:8px 14px; border-radius:20px; cursor:pointer; color:#A7ADBB; border:1px solid #333A4A;}
+  .vtab.active{background:var(--mark); color:var(--ink); border-color:var(--mark); font-weight:600;}
+  .screen{background:var(--paper); border-radius:8px 8px 0 0; padding:26px 26px 0; margin-top:6px; max-height:640px; overflow:hidden;}
+  .dview{display:none;}
+  .dview.active{display:block;}
+
+  .kpi-row{display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:20px;}
+  .kpi{background:#fff; border:1px solid var(--line); border-radius:6px; padding:14px 16px;}
+  .kpi .label{font-size:10px; text-transform:uppercase; letter-spacing:0.5px; color:var(--soft); font-weight:600;}
+  .kpi .value{font-family:'Spectral',serif; font-size:24px; margin-top:4px;}
+
+  /* Dropdown Styles */
+  .dropdown-container {
+    position: relative;
+    display: inline-block;
+    pointer-events: auto;
+  }
+  .dropdown-trigger {
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    user-select: none;
+  }
+  .dropdown-menu {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    width: 230px;
+    border-radius: 12px;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.3s;
+    z-index: 100;
+    text-align: left;
+  }
+  .dropdown-container:hover .dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+  .dropdown-menu a {
+    display: block;
+    padding: 10px 14px;
+    font-size: 12.5px;
+    font-weight: 500;
+    text-decoration: none;
+    color: var(--ink-2);
+    border-radius: 8px;
+    transition: background 0.2s ease, color 0.2s ease;
+  }
+  .dropdown-menu a:hover {
+    background: rgba(20,23,31,0.06);
+    color: var(--teal-deep);
+  }
+  .dropdown-menu a.active {
+    background: rgba(31,111,107,0.08);
+    color: var(--teal-deep);
+    font-weight: 600;
+  }
+
+  /* Planner specific layout */
+  .planner-layout{display:grid; grid-template-columns:1fr; gap:16px;}
+  table{width:100%; border-collapse:collapse; background:#fff; border:1px solid var(--line); border-radius:6px; overflow:hidden;}
+  thead th{text-align:left; font-size:10px; text-transform:uppercase; letter-spacing:0.4px; color:var(--soft); padding:10px 14px; border-bottom:1px solid var(--line); background:var(--paper-2);}
+  tbody td{padding:11px 14px; border-bottom:1px solid var(--line); font-size:12.5px;}
+  tbody tr:last-child td{border-bottom:none;}
+  .fte-bar-wrap{display:flex; align-items:center; gap:8px;}
+  .fte-bar{height:12px; border-radius:6px; background:var(--paper-2); flex:1; max-width:140px; overflow:hidden;}
+  .fte-bar > div{height:100%; border-radius:6px;}
+  .fte-val{font-family:'JetBrains Mono',monospace; font-size:11.5px; color:var(--ink-2); width:40px; text-align:right;}
+  .badge-p{font-family:'JetBrains Mono',monospace; font-size:10.5px; padding:3px 8px; border-radius:4px; font-weight:500;}
+  .badge-p.active{background:#E5F1E9; color:var(--green);}
+  .badge-p.pipeline{background:#FBF0DC; color:var(--amber);}
+  .badge-p.onhold{background:#F8E7E4; color:var(--red);}
+
+  .fade-bottom{height:36px; background:linear-gradient(180deg, transparent, var(--paper));}
+
+  /* Dataverse model cards */
+  .model-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-top:40px;}
+  .model-card{
+    border-radius:6px; padding:18px;
+    background-color: rgba(255,255,255,0.65);
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.5);
+    box-shadow: inset 0 1px 1px rgba(255,255,255,0.8), 0 10px 30px -10px rgba(20,23,31,0.08);
+    transition:box-shadow .3s ease, transform .3s ease;
+  }
+  .model-card:hover{box-shadow:0 16px 32px -16px rgba(20,23,31,0.2); transform:translateY(-2px) scale(1.02);}
+  .model-card .t-name{font-size:14px; font-weight:600; font-family:'Inter',sans-serif;}
+  .model-card .t-purpose{font-size:11.5px; color:var(--soft); margin-top:3px; line-height:1.5;}
+  .model-card ul{list-style:none; margin:12px 0 0; padding:12px 0 0; border-top:1px dashed var(--line);}
+  .model-card li{font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--ink-2); padding:2.5px 0; letter-spacing:0.2px;}
+  .model-card li .pk{color:var(--teal-deep); font-weight:500;}
+
+  /* Workflow cards */
+  .gov-flow{display:flex; align-items:flex-start; gap:14px; margin-top:40px;}
+  .gov-step{
+    flex:1; border-radius:8px; padding:20px;
+    background-color: rgba(255,255,255,0.65);
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.5);
+    box-shadow: inset 0 1px 1px rgba(255,255,255,0.8), 0 10px 30px -10px rgba(20,23,31,0.08);
+    transition:box-shadow .3s ease, transform .3s ease;
+  }
+  .gov-step:hover{box-shadow:0 16px 32px -16px rgba(20,23,31,0.2); transform:translateY(-2px) scale(1.02);}
+  .gov-icon{width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:15px; margin-bottom:14px;}
+  .gov-icon.iam{background:#E1EEEE; color:var(--teal-deep);}
+  .gov-icon.cap{background:#FBF0DC; color:var(--amber);}
+  .gov-icon.sync{background:#E5F1E9; color:var(--green);}
+  .gov-step h3{font-size:14.5px; font-weight:600; margin-bottom:8px;}
+  .gov-step p{font-size:12.5px; color:var(--soft); line-height:1.55;}
+  .gov-arrow{font-size:20px; color:var(--line); padding-top:34px; flex-shrink:0;}
+
+  /* Impact */
+  .impact-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-top:40px;}
+  .impact-card{
+    border-radius:8px; padding:22px;
+    background-color: rgba(255,255,255,0.65);
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.5);
+    box-shadow: inset 0 1px 1px rgba(255,255,255,0.8), 0 10px 30px -10px rgba(20,23,31,0.08);
+    transition:box-shadow .3s ease, transform .3s ease;
+  }
+  .impact-card:hover{box-shadow:0 16px 32px -16px rgba(20,23,31,0.2); transform:translateY(-2px) scale(1.02);}
+  .impact-card .i-cat{font-family:'JetBrains Mono',monospace; font-size:10px; text-transform:uppercase; color:var(--teal-deep); letter-spacing:0.5px;}
+  .impact-card .i-big{font-family:'Spectral',serif; font-size:26px; font-weight:700; margin-top:8px; color:var(--ink);}
+  .impact-card .i-big .from{color:var(--soft); font-size:16px; font-weight:400; text-decoration:line-through; margin-right:6px;}
+  .impact-card p{font-size:12.5px; color:var(--soft); margin:8px 0 0; line-height:1.55;}
+  .modelled-note{font-size:12px; color:var(--soft); margin-top:18px; font-style:italic;}
+
+  .reflect-grid{display:grid; grid-template-columns:1fr 1fr; gap:32px; margin-top:36px;}
+  .reflect-card h3{font-size:15px; font-weight:600; margin-bottom:10px;}
+  .reflect-card p{font-size:13.5px; color:var(--ink-2); line-height:1.65;}
+
+  .stack-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-top:40px;}
+  .stack-card{
+    border-radius:6px; padding:18px;
+    background-color: rgba(255,255,255,0.65);
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.5);
+    box-shadow: inset 0 1px 1px rgba(255,255,255,0.8), 0 10px 30px -10px rgba(20,23,31,0.08);
+    transition:box-shadow .3s ease, transform .3s ease;
+  }
+  .stack-card:hover{box-shadow:0 16px 32px -16px rgba(20,23,31,0.2); transform:translateY(-2px) scale(1.02);}
+  .stack-card .cat{font-family:'JetBrains Mono',monospace; font-size:10px; text-transform:uppercase; color:var(--teal-deep); letter-spacing:0.5px;}
+  .stack-card .item{font-size:14px; font-weight:600; margin-top:6px;}
+  .stack-card .desc{font-size:12px; color:var(--soft); margin-top:4px; line-height:1.5;}
+
+  footer{border-top:1px solid var(--line); padding:40px 0; text-align:center;}
+  footer p{font-size:12.5px; color:var(--soft);}
+  footer .flinks{display:flex; gap:20px; justify-content:center; margin-top:12px; font-size:13px; font-weight:500;}
+  footer .flinks a{text-decoration:none;}
+
+  @media (max-width: 820px){
+    .hero-grid, .reflect-grid{grid-template-columns:1fr;}
+    .kpi-row, .stack-grid{grid-template-columns:repeat(2,1fr);}
+    .model-grid, .impact-grid{grid-template-columns:1fr 1fr;}
+    .pipeline{grid-template-columns:1fr 1fr; row-gap:32px;}
+    .pipeline::before{display:none;}
+    .gov-flow{flex-direction:column;}
+    .gov-arrow{display:none;}
+  }
+
+  /* Dropdown Styles */
+  .dropdown-container {
+    position: relative;
+    display: inline-block;
+    pointer-events: auto;
+  }
+  .dropdown-trigger {
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    user-select: none;
+  }
+  .dropdown-menu {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    width: 230px;
+    border-radius: 12px;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.3s;
+    z-index: 100;
+    text-align: left;
+  }
+  .dropdown-container:hover .dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+  .dropdown-menu a {
+    display: block;
+    padding: 10px 14px;
+    font-size: 12.5px;
+    font-weight: 500;
+    text-decoration: none;
+    color: var(--ink-2);
+    border-radius: 8px;
+    transition: background 0.2s ease, color 0.2s ease;
+  }
+  .dropdown-menu a:hover {
+    background: rgba(20,23,31,0.06);
+    color: var(--teal-deep);
+  }
+  .dropdown-menu a.active {
+    background: rgba(31,111,107,0.08);
+    color: var(--teal-deep);
+    font-weight: 600;
+  }
+
+  /* Interactive Planner Custom Styles */
+  @keyframes pulse-red {
+    0% { background-color: #f8e7e4; }
+    50% { background-color: #fcebeb; box-shadow: 0 0 6px rgba(176,58,50,0.25); }
+    100% { background-color: #f8e7e4; }
+  }
+  .cell-over {
+    animation: pulse-red 2s infinite;
+    color: var(--red) !important;
+    font-weight: 600;
+  }
+  .cell-healthy {
+    background-color: #e2f0d9 !important;
+    color: var(--green) !important;
+  }
+  .cell-idle {
+    background-color: var(--paper-2) !important;
+    color: var(--soft) !important;
+  }
+  .slider-val-display {
+    min-width: 65px;
+  }
+  .alloc-slider {
+    cursor: pointer;
+    width: 100%;
+    height: 6px;
+    background: var(--line);
+    border-radius: 3px;
+    outline: none;
+    -webkit-appearance: none;
+  }
+  .alloc-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--teal);
+    box-shadow: 0 2px 6px rgba(20,23,31,0.15);
+    transition: transform 0.1s ease;
+  }
+  .alloc-slider::-webkit-slider-thumb:hover {
+    transform: scale(1.15);
+  }
+</style>
+</head>
+<body>
+
+<div class="nav-wrap">
+  <nav class="liquid-glass">
+    <a class="back-link" href="index.html">← Back to portfolio</a>
+    <div class="nav-links">
+      <a href="#approach">Approach</a>
+      <a href="#dashboards">Dashboards</a>
+      <a href="#data-model">Data model</a>
+      <a href="#integration">Integration</a>
+      <a href="#impact">Impact</a>
+    </div>
+    <div class="dropdown-container">
+      <a class="nav-btn dropdown-trigger">Case Studies ▾</a>
+      <div class="dropdown-menu liquid-glass">
+        <a href="regulation-inspector.html">Regulation Inspector</a>
+        <a href="ai-risk-workflow.html">AI Risk Workflow</a>
+        <a href="team-resource-tool.html" class="active">Team Resource Tool</a>
+        <a href="stock-time-machine.html">Stock Time Machine</a>
+      </div>
+    </div>
+  </nav>
+</div>
+
+<header class="hero">
+  <div class="ambient-orb" style="top:-15%; left:-10%; width:480px; height:480px; background:linear-gradient(135deg, rgba(31,111,107,0.14), rgba(240,185,77,0.07));"></div>
+  <div class="ambient-orb" style="top:30%; right:-15%; width:560px; height:560px; background:linear-gradient(225deg, rgba(31,111,107,0.06), rgba(240,185,77,0.13));"></div>
+  <div class="wrap hero-grid" style="position:relative; z-index:1;">
+    <div>
+      <div class="eyebrow">Concept Case Study</div>
+      <h1>Resource planning shouldn't stay stuck in spreadsheet formats.</h1>
+      <p class="lede">An IAM-integrated resource planner that reconciles team availability, FTE allocations, and initiative assignments in one central data model — designed to scale dynamically from manual MVP to an enterprise JIRA-connected system.</p>
+      <div class="tag-row">
+        <span class="tag">POWER PLATFORM</span>
+        <span class="tag">DATAVERSE</span>
+        <span class="tag">IAM INTEGRATION</span>
+        <span class="tag">FTE FORECASTING</span>
+        <span class="tag">JIRA SYNC</span>
+        <span class="tag">CAPACITY PLANNING</span>
+      </div>
+      <div class="hero-ctas">
+        <a class="btn" href="#dashboards">See the planner</a>
+        <a class="btn-ghost" href="#data-model">View the data model</a>
+      </div>
+    </div>
+
+    <div class="sim-card">
+      <div class="doc-label mono">ARCHITECTURAL BLUEPRINT · POWER PLATFORM DUAL MODE</div>
+      <h3>Dynamic Scaling Engine</h3>
+      <p class="desc">This system uses a modular data layer that scales gracefully from a manual-entry team planner to a fully automated JIRA-integrated enterprise system. Toggle the mode to see the architectural change.</p>
+      <div class="mode-switch-wrap">
+        <span class="label">Delivery Phase</span>
+        <div class="switch-row">
+          <button class="switch-btn active" data-mode="mvp">MVP (Manual)</button>
+          <button class="switch-btn" data-mode="ent">Enterprise (Auto)</button>
+        </div>
+      </div>
+      <div class="panel-body" id="simBody">
+        <strong>Manual Capacity Planning:</strong><br>
+        In the initial launch, team availability and FTE allocations are input directly via the Power Apps form. This maintains the central data model and provides immediate reportability in Power BI without waiting for complex API integrations.
+        <ul>
+          <li><strong>Source of Truth:</strong> Dedicated Dataverse tables</li>
+          <li><strong>Maintenance:</strong> Manual form updates by Team Leads</li>
+          <li><strong>Licensing:</strong> Standard Office 365 / Power Apps seeds</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section id="context">
+  <div class="wrap">
+    <div class="lead-block">
+      <div class="eyebrow">The problem</div>
+      <h2>The team planner is always out of sync with the project board.</h2>
+      <p>Most resource planners live in static spreadsheets owned by individual team leads. These trackers fall out of sync with the actual team rosters in HR systems, and they never match the task-level reality of JIRA boards. This leads to double-booking, missed deadlines, and burnt-out teams. This concept case study explores a unified Power Platform architecture that links IAM rosters, FTE allocations, and initiative assignments in a single Dataverse model, while presenting a visual capacity planner that changes based on the maturity of the organisation's tooling.</p>
+    </div>
+  </div>
+</section>
+
+<section id="approach">
+  <div class="wrap">
+    <div class="eyebrow">The approach</div>
+    <h2 style="font-size:30px;">A scalable blueprint for team capacity</h2>
+    <div class="pipeline">
+      <div class="step">
+        <div class="num">01</div>
+        <h3>IAM synchronization</h3>
+        <p>Integrate with Azure Active Directory (Microsoft Entra ID) to pull the true team roster — automatic starters, leavers, and department changes.</p>
+      </div>
+      <div class="step">
+        <div class="num">02</div>
+        <h3>Unified allocation model</h3>
+        <p>Team members are allocated to initiatives as fractional FTEs (e.g. 0.5 FTE on Initiative A) rather than simple names on cards, with enforced validation to prevent overallocation.</p>
+      </div>
+      <div class="step">
+        <div class="num">03</div>
+        <h3>FTE forecasting</h3>
+        <p>Power Automate compiles the allocations into a monthly timeline, generating a visual heat map that identifies resource shortages before they impact the schedule.</p>
+      </div>
+      <div class="step">
+        <div class="num">04</div>
+        <h3>Dual-mode scaling</h3>
+        <p>The system is built to scale: start with manual entry (MVP) to establish the habit and data model, then plug in the JIRA Cloud connector (Enterprise) to pull actual task backlogs automatically.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="dashboards">
+  <div class="wrap">
+    <div class="eyebrow">Dashboards</div>
+    <h2 style="font-size:30px; margin-bottom:32px;">The Planner &amp; Forecast views</h2>
+    <div class="showcase">
+      <div class="showcase-head">
+        <div>
+          <h2>One dataset, three capacity views</h2>
+          <p>Roster manager, monthly allocation grid, and portfolio forecast — all driven by the same central Dataverse model. All data shown is illustrative.</p>
+        </div>
+        <div class="view-tabs">
+          <div class="vtab active" data-view="d1">Overview</div>
+          <div class="vtab" data-view="d2">Planner</div>
+          <div class="vtab" data-view="d3">FTE Heatmap</div>
+        </div>
+      </div>
+
+      <div class="screen" style="overflow: visible; min-height: 520px; padding-bottom: 40px;">
+        <!-- KPI Row rendered dynamically -->
+        <div class="kpi-row" id="kpiRow">
+          <!-- Rendered by JS -->
+        </div>
+
+        <div class="dview active" id="d1">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <h3 style="font-size: 14.5px; font-weight: 600; margin: 0; color: var(--ink);">Initiative Assignments</h3>
+            <button class="nav-btn" style="padding: 6px 14px; font-size: 11px; margin: 0;" onclick="showAddInitiativeForm()">+ Add Initiative</button>
+          </div>
+          
+          <!-- Add Initiative inline card -->
+          <div id="addInitiativeCard" class="liquid-glass" style="display: none; border-radius: 8px; padding: 16px; margin-bottom: 20px; border: 1px solid var(--teal);">
+            <h4 style="font-size:13.5px; margin: 0 0 12px; font-weight:600; color:var(--teal-deep);">Create New Initiative</h4>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin-bottom: 12px;">
+              <div>
+                <label style="font-size: 10px; text-transform: uppercase; color: var(--soft); display: block; margin-bottom: 4px; font-weight:600;">Initiative Name</label>
+                <input type="text" id="newInitName" placeholder="e.g. AML Check V2" style="width: 100%; padding: 6px; font-size: 12px; border: 1px solid var(--line); border-radius: 4px;">
+              </div>
+              <div>
+                <label style="font-size: 10px; text-transform: uppercase; color: var(--soft); display: block; margin-bottom: 4px; font-weight:600;">Department</label>
+                <select id="newInitDept" style="width: 100%; padding: 6px; font-size: 12px; border: 1px solid var(--line); border-radius: 4px; height: 30px; background: white;">
+                  <option value="Risk & Compliance">Risk & Compliance</option>
+                  <option value="Operations">Operations</option>
+                  <option value="Technology">Technology</option>
+                  <option value="Finance">Finance</option>
+                </select>
+              </div>
+              <div>
+                <label style="font-size: 10px; text-transform: uppercase; color: var(--soft); display: block; margin-bottom: 4px; font-weight:600;">Type</label>
+                <select id="newInitType" style="width: 100%; padding: 6px; font-size: 12px; border: 1px solid var(--line); border-radius: 4px; height: 30px; background: white;">
+                  <option value="Strategic">Strategic</option>
+                  <option value="Regulatory">Regulatory</option>
+                  <option value="Operational">Operational</option>
+                  <option value="Infrastructure">Infrastructure</option>
+                </select>
+              </div>
+              <div>
+                <label style="font-size: 10px; text-transform: uppercase; color: var(--soft); display: block; margin-bottom: 4px; font-weight:600;">Target Date</label>
+                <input type="text" id="newInitDate" placeholder="e.g. 30 Nov" style="width: 100%; padding: 6px; font-size: 12px; border: 1px solid var(--line); border-radius: 4px;">
+              </div>
+              <div>
+                <label style="font-size: 10px; text-transform: uppercase; color: var(--soft); display: block; margin-bottom: 4px; font-weight:600;">Target FTE</label>
+                <input type="number" id="newInitFte" value="2.0" step="0.5" min="0.5" style="width: 100%; padding: 6px; font-size: 12px; border: 1px solid var(--line); border-radius: 4px;">
+              </div>
+            </div>
+            <div style="display: flex; gap: 8px; justify-content: flex-end;">
+              <button class="btn-ghost" style="padding: 5px 12px; font-size: 11px; border-radius:4px;" onclick="hideAddInitiativeForm()">Cancel</button>
+              <button class="nav-btn" style="padding: 5px 14px; font-size: 11px; margin: 0; border-radius:4px;" onclick="saveInitiative()">Save Initiative</button>
+            </div>
+          </div>
+
+          <div class="planner-layout" id="initiativesTableContainer">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+
+        <div class="dview" id="d2">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <h3 style="font-size: 14.5px; font-weight: 600; margin: 0; color: var(--ink);">Resource Roster</h3>
+            <button class="nav-btn" style="padding: 6px 14px; font-size: 11px; margin: 0;" onclick="showAddMemberForm()">+ Add Team Member</button>
+          </div>
+
+          <!-- Add Member inline card -->
+          <div id="addMemberCard" class="liquid-glass" style="display: none; border-radius: 8px; padding: 16px; margin-bottom: 20px; border: 1px solid var(--teal);">
+            <h4 style="font-size:13.5px; margin: 0 0 12px; font-weight:600; color:var(--teal-deep);">Add New Roster Member</h4>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 12px;">
+              <div>
+                <label style="font-size: 10px; text-transform: uppercase; color: var(--soft); display: block; margin-bottom: 4px; font-weight:600;">Full Name</label>
+                <input type="text" id="newMemName" placeholder="e.g. Alex Mercer" style="width: 100%; padding: 6px; font-size: 12px; border: 1px solid var(--line); border-radius: 4px;">
+              </div>
+              <div>
+                <label style="font-size: 10px; text-transform: uppercase; color: var(--soft); display: block; margin-bottom: 4px; font-weight:600;">Role Title</label>
+                <input type="text" id="newMemRole" placeholder="e.g. QA Engineer" style="width: 100%; padding: 6px; font-size: 12px; border: 1px solid var(--line); border-radius: 4px;">
+              </div>
+              <div>
+                <label style="font-size: 10px; text-transform: uppercase; color: var(--soft); display: block; margin-bottom: 4px; font-weight:600;">Department</label>
+                <select id="newMemDept" style="width: 100%; padding: 6px; font-size: 12px; border: 1px solid var(--line); border-radius: 4px; height: 30px; background: white;">
+                  <option value="Risk & Compliance">Risk & Compliance</option>
+                  <option value="Operations">Operations</option>
+                  <option value="Technology">Technology</option>
+                  <option value="Finance">Finance</option>
+                </select>
+              </div>
+            </div>
+            <div style="display: flex; gap: 8px; justify-content: flex-end;">
+              <button class="btn-ghost" style="padding: 5px 12px; font-size: 11px; border-radius:4px;" onclick="hideAddMemberForm()">Cancel</button>
+              <button class="nav-btn" style="padding: 5px 14px; font-size: 11px; margin: 0; border-radius:4px;" onclick="saveTeamMember()">Save Roster Member</button>
+            </div>
+          </div>
+
+          <!-- Allocation Editor Drawer / Inline form -->
+          <div id="allocationEditCard" class="liquid-glass" style="display: none; border-radius: 8px; padding: 18px; margin-bottom: 20px; border: 1px solid var(--mark);">
+            <h4 style="font-size:13.5px; margin: 0 0 4px; font-weight:600; color:var(--ink);" id="allocEditTitle">Edit Splits for David Kim</h4>
+            <p style="font-size: 11.5px; color: var(--soft); margin: 0 0 16px;">Configure fraction FTE allocation splits across projects. Keep total sum &le; 1.0 FTE to avoid burn-out.</p>
+            
+            <div id="allocSlidersContainer" style="display: flex; flex-direction: column; gap: 14px; margin-bottom: 18px;">
+              <!-- Dynamic slider controls -->
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px dashed var(--line); padding-top: 12px;">
+              <div style="font-size:12.5px; font-weight:600;">
+                Total Allocated: <span id="allocEditSum" style="font-family:'JetBrains Mono'; color: var(--green);">1.2</span> FTE
+              </div>
+              <div style="display: flex; gap: 8px;">
+                <button class="btn-ghost" style="padding: 5px 12px; font-size: 11px; border-radius:4px;" onclick="hideAllocEditor()">Cancel</button>
+                <button class="nav-btn" style="padding: 5px 14px; font-size: 11px; margin: 0; border-radius:4px;" onclick="saveAllocSplits()">Apply Splits</button>
+              </div>
+            </div>
+          </div>
+
+          <div id="rosterTableContainer">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+
+        <div class="dview" id="d3">
+          <div style="margin-bottom: 16px;">
+            <h3 style="font-size: 14.5px; font-weight: 600; margin: 0 0 4px; color: var(--ink);">Dynamic FTE Forecasting Heatmap</h3>
+            <p style="font-size:12px; color:var(--soft); margin:0;">Monthly timeline capacity forecasting. Over-allocated resources automatically highlight in red.</p>
+          </div>
+
+          <div id="heatmapTableContainer" style="margin-bottom: 16px; overflow-x: auto;">
+            <!-- Rendered by JS -->
+          </div>
+
+          <div style="display:flex; gap:16px; align-items:center; font-size:11px; color:var(--soft); font-family:'JetBrains Mono',monospace;">
+            <span style="font-weight:600; text-transform:uppercase;">Legend:</span>
+            <span style="display:inline-flex; align-items:center; gap:4px;"><span style="width:12px; height:12px; background:var(--paper-2); border-radius:2px;"></span> Idle (0.0 FTE)</span>
+            <span style="display:inline-flex; align-items:center; gap:4px;"><span style="width:12px; height:12px; background:#e2f0d9; border-radius:2px;"></span> Healthy (&le;1.0 FTE)</span>
+            <span style="display:inline-flex; align-items:center; gap:4px;"><span style="width:12px; height:12px; background:#f8e7e4; border-radius:2px; animation: pulse-red 2s infinite;"></span> Overallocated (&gt;1.0 FTE)</span>
+          </div>
+        </div>
+
+        <div class="fade-bottom"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="data-model" class="glass-section">
+  <div class="ambient-orb" style="top:10%; right:-10%; width:480px; height:480px; background:linear-gradient(225deg, rgba(31,111,107,0.11), rgba(240,185,77,0.06));"></div>
+  <div class="wrap">
+    <div class="eyebrow">Data model</div>
+    <h2 style="font-size:30px;">A robust relational schema in Dataverse.</h2>
+    <p style="font-size:15.5px; color:var(--ink-2); margin-top:16px; max-width:680px;">Rosters, initiatives, allocations, and demands are held in six related tables with enforced keys and validation rules. That's what prevents double-booking at the database level — before a user can even save the record.</p>
+    <div class="model-grid">
+      <div class="model-card">
+        <div class="t-name">Team Member (Roster)</div>
+        <div class="t-purpose">True roster synchronised from Entra ID (Active Directory)</div>
+        <ul>
+          <li class="pk">MemberID</li><li>FullName</li><li>Email</li><li>Role</li><li>PrimaryDept</li><li>Status</li>
+        </ul>
+      </div>
+      <div class="model-card">
+        <div class="t-name">Initiative</div>
+        <div class="t-purpose">Projects, business-as-usual streams, and support pools</div>
+        <ul>
+          <li class="pk">InitiativeID</li><li>Name</li><li>Description</li><li>Department</li><li>Status</li><li>TargetDate</li>
+        </ul>
+      </div>
+      <div class="model-card">
+        <div class="t-name">FTE Allocation</div>
+        <div class="t-purpose">Related table tracking splits per team member, per project</div>
+        <ul>
+          <li class="pk">AllocationID</li><li>MemberID</li><li>InitiativeID</li><li>FTESplit</li><li>StartDate</li><li>EndDate</li>
+        </ul>
+      </div>
+      <div class="model-card">
+        <div class="t-name">Resource Demand</div>
+        <div class="t-purpose">Unfilled resource requirements per initiative (roles needed)</div>
+        <ul>
+          <li class="pk">DemandID</li><li>InitiativeID</li><li>RoleRequired</li><li>FTENeeded</li><li>TargetDate</li>
+        </ul>
+      </div>
+      <div class="model-card">
+        <div class="t-name">Department</div>
+        <div class="t-purpose">Business units and primary budgets</div>
+        <ul>
+          <li class="pk">DepartmentID</li><li>Name</li><li>Lead</li>
+        </ul>
+      </div>
+      <div class="model-card">
+        <div class="t-name">Holiday / Leave</div>
+        <div class="t-purpose">Absence logs that dynamically reduce available capacity</div>
+        <ul>
+          <li class="pk">LeaveID</li><li>MemberID</li><li>StartDate</li><li>EndDate</li><li>Type</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="integration" class="glass-section">
+  <div class="ambient-orb" style="top:15%; left:-12%; width:460px; height:460px; background:linear-gradient(135deg, rgba(31,111,107,0.10), rgba(240,185,77,0.07));"></div>
+  <div class="wrap">
+    <div class="eyebrow">Enterprise integration</div>
+    <h2 style="font-size:30px;">How the components tie together</h2>
+    <div class="gov-flow">
+      <div class="gov-step">
+        <div class="gov-icon iam">Entra</div>
+        <h3>IAM Sync</h3>
+        <p>A scheduled Power Automate flow pulls the roster from Microsoft Entra ID daily, keeping leavers, starters, and department changes updated automatically.</p>
+      </div>
+      <div class="gov-arrow">→</div>
+      <div class="gov-step">
+        <div class="gov-icon cap">Apps</div>
+        <h3>Capacity Form</h3>
+        <p>A Power Apps form validates allocations as they are input — ensuring split FTEs don't exceed availability (e.g. flagging David Kim when his allocation hits 1.2 FTE).</p>
+      </div>
+      <div class="gov-arrow">→</div>
+      <div class="gov-step">
+        <div class="gov-icon sync">Jira</div>
+        <h3>Jira Connector</h3>
+        <p>The system is ready: connect JIRA Cloud to Dataverse via standard APIs to map project tasks and active sprints against the FTE allocations.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="impact">
+  <div class="wrap">
+    <div class="eyebrow">Impact</div>
+    <h2 style="font-size:30px;">What a unified planner changes</h2>
+    <div class="impact-grid">
+      <div class="impact-card">
+        <div class="i-cat">Roster accuracy</div>
+        <div class="i-big"><span class="from">70%</span>100%</div>
+        <p> Roster alignment, synchronised directly from Microsoft Entra ID to eliminate leavers and ghost resources.</p>
+      </div>
+      <div class="impact-card">
+        <div class="i-cat">Planning effort</div>
+        <div class="i-big"><span class="from">3 days</span>4 hours</div>
+        <p>Monthly allocation compilation effort, replaced by real-time visual capacity and overallocation alerts.</p>
+      </div>
+      <div class="impact-card">
+        <div class="i-cat">Decision support</div>
+        <div class="i-big">One view</div>
+        <p>A centralized portfolio view of team capacity, holiday logs, and unfilled project demand in a single dashboard.</p>
+      </div>
+    </div>
+    <p class="modelled-note">Figures are modelled target outcomes for this concept design — illustrating the scale of improvement a structured planner like this is built to deliver, not measured client results.</p>
+  </div>
+</section>
+
+<section id="reflection">
+  <div class="wrap">
+    <div class="eyebrow">Reflection</div>
+    <h2 style="font-size:30px;">What designing this sharpened</h2>
+    <div class="reflect-grid">
+      <div class="reflect-card">
+        <h3>Design for modular growth</h3>
+        <p>The data layer was separated from the interface from day one, so we can replace manual entry with automated JIRA APIs without rebuilding the planner UI or the Power BI reports.</p>
+      </div>
+      <div class="reflect-card">
+        <h3>Enforce rules at the database layer</h3>
+        <p>Trying to prevent overallocation inside individual form screens is brittle. Creating validation rules directly in Dataverse ensures data integrity — no matter which app writes the record.</p>
+      </div>
+      <div class="reflect-card">
+        <h3>Capacity planning is a timing problem</h3>
+        <p>Rosters change, holidays happen, and projects slip. A capacity model that assumes a fixed team over a six-month window is immediately wrong. The design incorporates holiday logs directly into available capacity calculations.</p>
+      </div>
+      <div class="reflect-card">
+        <h3>Actionable alerts are better than complex reports</h3>
+        <p>Team leads don't want to dig through dense reports to find over-allocated people. Visual highlights (like David Kim's red alert) tell them exactly where the bottleneck is in three seconds.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>Team Management &amp; Resource Allocation Tool — a concept case study in resource planning and process optimization.</p>
+  <div class="flinks">
+    <a href="index.html">Home</a>
+    <a href="regulation-inspector.html">Regulation Inspector</a>
+    <a href="ai-risk-workflow.html">AI Risk Workflow</a>
+    <a href="stock-time-machine.html">Time Machine</a>
+    <a href="#top">Back to top</a>
+  </div>
+</footer>
+
+<script>
+// Toggle simulated mode in the dynamic scaling engine
+const simulations = {
+  mvp: `
+    <strong>Manual Capacity Planning:</strong><br>
+    In the initial launch, team availability and FTE allocations are input directly via the Power Apps form. This maintains the central data model and provides immediate reportability in Power BI without waiting for complex API integrations.
+    <ul>
+      <li><strong>Source of Truth:</strong> Dedicated Dataverse tables</li>
+      <li><strong>Maintenance:</strong> Manual form updates by Team Leads</li>
+      <li><strong>Licensing:</strong> Standard Office 365 / Power Apps seeds</li>
+    </ul>
+  `,
+  ent: `
+    <strong>Automated JIRA Sync:</strong><br>
+    Once the process is established, a JIRA Cloud connector maps active sprints, epics, and story points directly to the FTE allocations in Dataverse. This reconciles plan vs. actual task execution automatically.
+    <ul>
+      <li><strong>Source of Truth:</strong> JIRA Cloud APIs mapped to Dataverse keys</li>
+      <li><strong>Maintenance:</strong> Automatic scheduled sync daily</li>
+      <li><strong>Licensing:</strong> Premium connectors / Power Apps licensing required</li>
+    </ul>
+  `
+};
+
+document.querySelectorAll('.switch-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.switch-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('simBody').innerHTML = simulations[btn.dataset.mode];
+  });
+});
+
+// View tabs handler
+document.querySelectorAll('.vtab').forEach(t => t.addEventListener('click', () => {
+  document.querySelectorAll('.vtab').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.dview').forEach(x=>x.classList.remove('active'));
+  t.classList.add('active');
+  document.getElementById(t.dataset.view).classList.add('active');
+}));
+
+// Rich Interactive Capacity Planner Engine
+let initiatives = [
+  { id: "i1", name: "Risk Engine v2", dept: "Risk & Compliance", type: "Strategic", fte: 4.5, status: "Active", date: "30 Sep" },
+  { id: "i2", name: "DORA Compliance Pass", dept: "Risk & Compliance", type: "Regulatory", fte: 3.0, status: "Active", date: "31 Dec" },
+  { id: "i3", name: "Third-Party Assessment Flow", dept: "Operations", type: "Operational", fte: 2.0, status: "Pipeline", date: "15 Nov" },
+  { id: "i4", name: "Azure Migration Phase 2", dept: "Technology", type: "Infrastructure", fte: 1.7, status: "On Hold", date: "31 Oct" }
+];
+
+let teamMembers = [
+  { id: "t1", name: "Sarah Jenkins", role: "Sr. BA / Analyst", dept: "Risk & Compliance", allocations: { i1: 0.5, i2: 0.5 } },
+  { id: "t2", name: "Robert Chen", role: "Data Engineer", dept: "Technology", allocations: { i1: 0.8 } },
+  { id: "t3", name: "Elena Rostova", role: "Product Owner", dept: "Operations", allocations: { i3: 1.0 } },
+  { id: "t4", name: "David Kim", role: "Solutions Architect", dept: "Technology", allocations: { i1: 0.5, i4: 0.5, i2: 0.2 } }
+];
+
+let activeAllocEditMemberId = null;
+
+function renderAll() {
+  renderKPIs();
+  renderInitiatives();
+  renderRoster();
+  renderHeatmap();
+}
+
+function renderKPIs() {
+  const headcount = teamMembers.length;
+  const totalFTE = headcount * 1.0;
+  
+  let allocatedFTE = 0;
+  teamMembers.forEach(m => {
+    Object.values(m.allocations).forEach(val => {
+      allocatedFTE += val;
+    });
+  });
+
+  let targetTotalFte = 0;
+  initiatives.forEach(i => {
+    targetTotalFte += i.fte;
+  });
+  const openDemands = Math.max(0, targetTotalFte - allocatedFTE);
+
+  document.getElementById('kpiRow').innerHTML = `
+    <div class="kpi"><div class="label">Total Avail. FTEs</div><div class="value">${totalFTE.toFixed(1)}</div></div>
+    <div class="kpi"><div class="label">Allocated FTEs</div><div class="value">${allocatedFTE.toFixed(1)}</div></div>
+    <div class="kpi"><div class="label">Headcount</div><div class="value">${headcount} people</div></div>
+    <div class="kpi"><div class="label">Unfilled Target FTE</div><div class="value">${openDemands.toFixed(1)} FTE</div></div>
+  `;
+}
+
+function renderInitiatives() {
+  const initAllocations = {};
+  initiatives.forEach(i => {
+    initAllocations[i.id] = 0;
+  });
+  
+  teamMembers.forEach(m => {
+    Object.entries(m.allocations).forEach(([initId, val]) => {
+      if (initAllocations[initId] !== undefined) {
+        initAllocations[initId] += val;
+      }
+    });
+  });
+
+  let html = `
+    <table>
+      <thead>
+        <tr>
+          <th>Initiative</th>
+          <th>Department</th>
+          <th>Type</th>
+          <th>FTE Allocated / Target</th>
+          <th>Status</th>
+          <th>Target Date</th>
+          <th style="text-align:right;">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+  `;
+
+  initiatives.forEach(i => {
+    const allocated = initAllocations[i.id] || 0;
+    const pct = Math.min(100, (allocated / i.fte) * 100);
+    const barColor = allocated > i.fte ? "var(--red)" : "var(--teal-deep)";
+    
+    let badgeClass = "badge-p";
+    if (i.status.toLowerCase() === "active") badgeClass += " active";
+    else if (i.status.toLowerCase() === "pipeline") badgeClass += " pipeline";
+    else badgeClass += " onhold";
+
+    html += `
+      <tr>
+        <td style="font-weight:600; color:var(--ink);">${i.name}</td>
+        <td>${i.dept}</td>
+        <td>${i.type}</td>
+        <td>
+          <div class="fte-bar-wrap">
+            <div class="fte-bar">
+              <div style="width:${pct}%; background:${barColor};"></div>
+            </div>
+            <span class="fte-val">${allocated.toFixed(1)}<span style="color:var(--soft); font-size:10px;">/${i.fte.toFixed(1)}</span></span>
+          </div>
+        </td>
+        <td><span class="${badgeClass}">${i.status}</span></td>
+        <td>${i.date}</td>
+        <td style="text-align:right;">
+          <button class="btn-ghost" style="padding: 3px 8px; font-size: 10.5px; border-radius:4px; margin:0; cursor:pointer;" onclick="deleteInitiative('${i.id}')">Delete</button>
+        </td>
+      </tr>
+    `;
+  });
+
+  if (initiatives.length === 0) {
+    html += `<tr><td colspan="7" style="text-align:center; padding:24px; color:var(--soft);">No active initiatives. Click "+ Add Initiative" to create one.</td></tr>`;
+  }
+
+  html += `
+      </tbody>
+    </table>
+  `;
+
+  document.getElementById('initiativesTableContainer').innerHTML = html;
+}
+
+function renderRoster() {
+  let html = `
+    <table>
+      <thead>
+        <tr>
+          <th>Team Member</th>
+          <th>Role</th>
+          <th>Primary Dept.</th>
+          <th>Total Allocation</th>
+          <th>Initiatives &amp; Splits</th>
+          <th style="text-align:right;">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+  `;
+
+  teamMembers.forEach(m => {
+    let totalAlloc = 0;
+    const splitDetails = [];
+
+    Object.entries(m.allocations).forEach(([initId, val]) => {
+      totalAlloc += val;
+      const init = initiatives.find(i => i.id === initId);
+      if (init) {
+        splitDetails.push(`${init.name} (${val.toFixed(1)})`);
+      }
+    });
+
+    const isOver = totalAlloc > 1.01; // Tiny float threshold
+    const barWidth = Math.min(100, (totalAlloc / 1.0) * 100);
+    const barColor = isOver ? "var(--red)" : "var(--green)";
+    const splitText = splitDetails.length > 0 ? splitDetails.join(", ") : "Unallocated";
+
+    html += `
+      <tr>
+        <td style="font-weight:600; color:var(--ink);">${m.name}</td>
+        <td>${m.role}</td>
+        <td>${m.dept}</td>
+        <td>
+          <div class="fte-bar-wrap">
+            <div class="fte-bar">
+              <div style="width:${barWidth}%; background:${barColor};"></div>
+            </div>
+            <span class="fte-val" style="color: ${isOver ? 'var(--red)' : 'inherit'}; font-weight: ${isOver ? '700' : 'inherit'};">
+              ${totalAlloc.toFixed(1)}
+            </span>
+          </div>
+        </td>
+        <td style="max-width:240px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${splitText}">
+          ${splitText} ${isOver ? '<strong style="color:var(--red); font-size:10px; margin-left:4px;">OVER</strong>' : ''}
+        </td>
+        <td style="text-align:right;">
+          <div style="display:inline-flex; gap:6px;">
+            <button class="nav-btn" style="padding: 4px 10px; font-size: 10.5px; margin:0; border-radius:4px; box-shadow:none; background:var(--teal-deep); cursor:pointer;" onclick="editAllocations('${m.id}')">Edit Splits</button>
+            <button class="btn-ghost" style="padding: 3px 8px; font-size: 10.5px; border-radius:4px; margin:0; cursor:pointer;" onclick="deleteMember('${m.id}')">Remove</button>
+          </div>
+        </td>
+      </tr>
+    `;
+  });
+
+  if (teamMembers.length === 0) {
+    html += `<tr><td colspan="6" style="text-align:center; padding:24px; color:var(--soft);">No rostered team members. Click "+ Add Team Member" to add resources.</td></tr>`;
+  }
+
+  html += `
+      </tbody>
+    </table>
+  `;
+
+  document.getElementById('rosterTableContainer').innerHTML = html;
+}
+
+function renderHeatmap() {
+  const months = ["Aug 26", "Sep 26", "Oct 26", "Nov 26", "Dec 26", "Jan 27"];
+  
+  let html = `
+    <table>
+      <thead>
+        <tr>
+          <th>Team Member</th>
+          <th>Role</th>
+  `;
+  
+  months.forEach(m => {
+    html += `<th>${m}</th>`;
+  });
+  
+  html += `
+        </tr>
+      </thead>
+      <tbody>
+  `;
+
+  teamMembers.forEach(m => {
+    html += `
+      <tr>
+        <td style="font-weight:600; color:var(--ink);">${m.name}</td>
+        <td style="font-size:11.5px; color:var(--soft);">${m.role}</td>
+    `;
+
+    months.forEach((month, index) => {
+      let cellAlloc = 0;
+      Object.entries(m.allocations).forEach(([initId, val]) => {
+        const init = initiatives.find(i => i.id === initId);
+        if (init) {
+          let isActive = true;
+          if (init.id === "i1" && index > 1) isActive = false; 
+          if (init.id === "i4" && index > 2) isActive = false; 
+          if (init.id === "i3" && index > 3) isActive = false; 
+          if (init.id === "i2" && index > 4) isActive = false; 
+          
+          if (isActive) {
+            cellAlloc += val;
+          }
+        }
+      });
+
+      let cellClass = "cell-idle";
+      if (cellAlloc > 1.01) cellClass = "cell-over";
+      else if (cellAlloc > 0.01) cellClass = "cell-healthy";
+
+      html += `<td class="${cellClass}" style="text-align:center; font-family:'JetBrains Mono'; font-weight:600; font-size:12px;">${cellAlloc.toFixed(1)}</td>`;
+    });
+
+    html += `
+      </tr>
+    `;
+  });
+
+  if (teamMembers.length === 0) {
+    html += `<tr><td colspan="8" style="text-align:center; padding:24px; color:var(--soft);">No roster data available.</td></tr>`;
+  }
+
+  html += `
+      </tbody>
+    </table>
+  `;
+
+  document.getElementById('heatmapTableContainer').innerHTML = html;
+}
+
+function showAddInitiativeForm() {
+  document.getElementById('addInitiativeCard').style.display = 'block';
+  document.getElementById('newInitName').focus();
+}
+function hideAddInitiativeForm() {
+  document.getElementById('addInitiativeCard').style.display = 'none';
+}
+function saveInitiative() {
+  const name = document.getElementById('newInitName').value.trim();
+  const dept = document.getElementById('newInitDept').value;
+  const type = document.getElementById('newInitType').value;
+  const date = document.getElementById('newInitDate').value.trim() || "31 Dec";
+  const fte = parseFloat(document.getElementById('newInitFte').value) || 2.0;
+
+  if (!name) {
+    alert("Please enter an initiative name.");
+    return;
+  }
+
+  const newId = "i_" + Date.now();
+  initiatives.push({ id: newId, name, dept, type, fte, status: "Active", date });
+  
+  document.getElementById('newInitName').value = "";
+  hideAddInitiativeForm();
+  renderAll();
+}
+
+function deleteInitiative(id) {
+  initiatives = initiatives.filter(i => i.id !== id);
+  teamMembers.forEach(m => {
+    delete m.allocations[id];
+  });
+  renderAll();
+}
+
+function showAddMemberForm() {
+  document.getElementById('addMemberCard').style.display = 'block';
+  document.getElementById('newMemName').focus();
+}
+function hideAddMemberForm() {
+  document.getElementById('addMemberCard').style.display = 'none';
+}
+function saveTeamMember() {
+  const name = document.getElementById('newMemName').value.trim();
+  const role = document.getElementById('newMemRole').value.trim();
+  const dept = document.getElementById('newMemDept').value;
+
+  if (!name || !role) {
+    alert("Please enter name and role.");
+    return;
+  }
+
+  const newId = "t_" + Date.now();
+  teamMembers.push({ id: newId, name, role, dept, allocations: {} });
+
+  document.getElementById('newMemName').value = "";
+  document.getElementById('newMemRole').value = "";
+  hideAddMemberForm();
+  renderAll();
+}
+
+function deleteMember(id) {
+  teamMembers = teamMembers.filter(m => m.id !== id);
+  if (activeAllocEditMemberId === id) {
+    hideAllocEditor();
+  }
+  renderAll();
+}
+
+function editAllocations(id) {
+  activeAllocEditMemberId = id;
+  const member = teamMembers.find(m => m.id === id);
+  if (!member) return;
+
+  document.getElementById('allocationEditCard').style.display = 'block';
+  document.getElementById('allocEditTitle').innerHTML = `Configure FTE Splits for: <strong>${member.name}</strong>`;
+
+  let slidersHtml = "";
+  initiatives.forEach(i => {
+    const currentAlloc = member.allocations[i.id] || 0;
+    slidersHtml += `
+      <div style="display:grid; grid-template-columns: 160px 1fr 75px; align-items:center; gap:12px;">
+        <span style="font-size:12px; font-weight:600; color:var(--ink); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${i.name}">${i.name}</span>
+        <input type="range" class="alloc-slider" data-init-id="${i.id}" min="0" max="1.0" step="0.1" value="${currentAlloc}" oninput="updateAllocSum()">
+        <span class="slider-val-display" style="font-family:'JetBrains Mono',monospace; font-size:11px; text-align:right; color:var(--teal-deep); font-weight:600;">${currentAlloc.toFixed(1)} FTE</span>
+      </div>
+    `;
+  });
+
+  if (initiatives.length === 0) {
+    slidersHtml = `<div style="font-size:12px; color:var(--soft); text-align:center; padding:12px;">No active initiatives available. Create one first!</div>`;
+  }
+
+  document.getElementById('allocSlidersContainer').innerHTML = slidersHtml;
+  updateAllocSum();
+}
+
+function updateAllocSum() {
+  let sum = 0;
+  const sliders = document.querySelectorAll('.alloc-slider');
+  sliders.forEach(slider => {
+    const val = parseFloat(slider.value);
+    sum += val;
+    const label = slider.parentElement.querySelector('.slider-val-display');
+    if (label) {
+      label.innerHTML = `${val.toFixed(1)} FTE`;
+    }
+  });
+
+  const sumDisplay = document.getElementById('allocEditSum');
+  sumDisplay.innerHTML = sum.toFixed(1);
+  if (sum > 1.01) {
+    sumDisplay.style.color = "var(--red)";
+  } else {
+    sumDisplay.style.color = "var(--green)";
+  }
+}
+
+function saveAllocSplits() {
+  if (!activeAllocEditMemberId) return;
+  const member = teamMembers.find(m => m.id === activeAllocEditMemberId);
+  if (!member) return;
+
+  const sliders = document.querySelectorAll('.alloc-slider');
+  const newAllocations = {};
+
+  sliders.forEach(slider => {
+    const initId = slider.dataset.initId;
+    const val = parseFloat(slider.value);
+    if (val > 0.01) {
+      newAllocations[initId] = val;
+    }
+  });
+
+  member.allocations = newAllocations;
+  hideAllocEditor();
+  renderAll();
+}
+
+function hideAllocEditor() {
+  document.getElementById('allocationEditCard').style.display = 'none';
+  activeAllocEditMemberId = null;
+}
+
+// Bootstrap
+renderAll();
+</script>
+
+</body>
+</html>
