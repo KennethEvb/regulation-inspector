@@ -1,0 +1,6 @@
+{
+  "name": "Regulation Inspector",
+  "description": "Parse regulatory text, extract compliance requirements, identify compliance gaps, and track resolution status with an interactive dashboard.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
