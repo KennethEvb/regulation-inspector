@@ -832,8 +832,11 @@ function showRefPopoverFor(chip) {
   // getBoundingClientRect() on a wrapped inline span returns the union box across
   // every line it touches, which is nearly the full paragraph width here — that's
   // why the popover used to drift toward the same spot regardless of which phrase
-  // was hovered. getClientRects()[0] gives the actual first line-fragment instead.
-  const hlRect = hl.getClientRects()[0] || hl.getBoundingClientRect();
+  // was hovered. getClientRects() gives one rect per line-fragment instead; anchor
+  // to the LAST fragment specifically, so the popover appears below the entire
+  // phrase (every line of it) rather than covering the phrase's own second line.
+  const hlRectList = hl.getClientRects();
+  const hlRect = hlRectList[hlRectList.length - 1] || hl.getBoundingClientRect();
   
   // Calculate horizontal position - centered on the specific highlighted regulation text segment (.hl)
   let left = (hlRect.left + hlRect.width / 2) - cardRect.left - 150;
