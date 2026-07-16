@@ -128,7 +128,21 @@
   .chart-canvas-wrap{height:280px; position:relative; margin-top:20px; display:flex; align-items:flex-end;}
   .chart-svg{width:100%; height:100%; display:block;}
   .chart-point-lbl{font-family:'JetBrains Mono',monospace; font-size:10px; fill:#A7ADBB;}
+  .chart-axis-lbl{font-family:'JetBrains Mono',monospace; font-size:9.5px; fill:#7A8290;}
   .grid-line{stroke:#262B36; stroke-width:1;}
+  .chart-point{transition:r .15s ease;}
+  .chart-point:hover{r:7;}
+  .chart-hint{font-family:'JetBrains Mono',monospace; font-size:11px; color:#7A8290; margin-top:14px; text-align:center;}
+
+  .chart-tooltip{
+    position:absolute; display:none; z-index:20; min-width:190px;
+    background:#1D212B; border:1px solid #333A4A; border-radius:8px; padding:12px 14px;
+    box-shadow:0 12px 28px -8px rgba(0,0,0,0.5); pointer-events:none;
+  }
+  .chart-tooltip.open{display:block;}
+  .chart-tooltip .ct-year{font-family:'JetBrains Mono',monospace; font-size:10px; text-transform:uppercase; letter-spacing:0.5px; color:var(--mark); margin-bottom:8px;}
+  .chart-tooltip .ct-row{display:flex; justify-content:space-between; gap:16px; font-size:12px; color:#A7ADBB; padding:4px 0;}
+  .chart-tooltip .ct-row strong{color:#F5F4EF; font-family:'JetBrains Mono',monospace; font-weight:500;}
 
   .reflect-grid{display:grid; grid-template-columns:1fr 1fr; gap:32px; margin-top:36px;}
   .reflect-card h3{font-size:15px; font-weight:600; margin-bottom:10px;}
@@ -212,15 +226,7 @@
       <a href="#interactive-simulator">Interactive simulator</a>
       <a href="#reflection">Reflection</a>
     </div>
-    <div class="dropdown-container">
-      <a class="nav-btn dropdown-trigger">Case Studies ▾</a>
-      <div class="dropdown-menu liquid-glass">
-        <a href="regulation-inspector.html">Regulation Inspector</a>
-        <a href="ai-risk-workflow.html">AI Risk Workflow</a>
-        <a href="team-resource-tool.html">Team Resource Tool</a>
-        <a href="stock-time-machine.html" class="active">Stock Time Machine</a>
-      </div>
-    </div>
+    <a class="nav-btn" href="resume.pdf" download="Kenneth-Evbuomwan-CV.pdf">Download CV</a>
   </nav>
 </div>
 
@@ -388,7 +394,9 @@
         <svg class="chart-svg" id="chartSvg" viewBox="0 0 800 280">
           <!-- SVG content generated dynamically -->
         </svg>
+        <div class="chart-tooltip" id="chartTooltip"></div>
       </div>
+      <p class="chart-hint">Click a point on the line for the share price and portfolio value at that year.</p>
     </div>
   </div>
 </section>
@@ -536,16 +544,24 @@ function runSimulation(){
   const trajectory = trajYears.map(y => ({ date: String(y), price: asset.prices[y] }));
   trajectory.push({ date: "2026", price: asset.prices.today });
 
-  drawChart(trajectory);
+  drawChart(trajectory, amount, shares);
   resultsWrap.classList.add('active');
 }
 
-function drawChart(traj){
+function fmtPrice(v){
+  if (v >= 1000) return '$' + (v / 1000).toLocaleString('en-US', {maximumFractionDigits: v >= 10000 ? 0 : 1}) + 'k';
+  return '$' + v.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+}
+
+let chartTooltipIdx = null;
+
+function drawChart(traj, amount, shares){
   const width = 800;
   const height = 280;
   const padding = 50;
+  const leftPad = 66;
 
-  const minX = padding;
+  const minX = leftPad;
   const maxX = width - padding;
   const minY = height - padding;
   const maxY = padding;
@@ -553,16 +569,20 @@ function drawChart(traj){
   const maxVal = Math.max(...traj.map(t => t.price));
   const minVal = Math.min(...traj.map(t => t.price));
 
-  // Generate grid lines
+  // Grid lines with Y-axis value labels, so the price at any height is readable
+  // without having to click a point.
   let gridLines = "";
   for(let i = 0; i <= 4; i++){
     const yVal = minY - (i / 4) * (minY - maxY);
-    gridLines += `<line class="grid-line" x1="${padding}" y1="${yVal}" x2="${width - padding}" y2="${yVal}"/>`;
+    const priceAtLine = (i / 4) * maxVal;
+    gridLines += `<line class="grid-line" x1="${leftPad}" y1="${yVal}" x2="${width - padding}" y2="${yVal}"/>`;
+    gridLines += `<text class="chart-axis-lbl" x="${leftPad - 10}" y="${yVal + 4}" text-anchor="end">${fmtPrice(priceAtLine)}</text>`;
   }
 
-  // Draw path
+  // Draw path + area fill
   let points = "";
   let chartElements = "";
+  const coords = [];
 
   traj.forEach((t, i) => {
     const x = minX + (i / (traj.length - 1)) * (maxX - minX);
@@ -570,26 +590,91 @@ function drawChart(traj){
     const priceScale = maxVal === minVal ? 1 : (t.price / maxVal);
     const y = minY - priceScale * (minY - maxY);
     points += `${x},${y} `;
+    coords.push({x, y, date: t.date, price: t.price});
+  });
 
+  const area = `<polygon points="${minX},${minY} ${points} ${maxX},${minY}" fill="url(#chartGradient)" stroke="none"/>`;
+  const path = `<polyline points="${points}" fill="none" stroke="#F0B94D" stroke-width="3" stroke-linejoin="round"/>`;
+
+  coords.forEach((c, i) => {
     // For labels, only draw ~8 points to avoid overcrowding
     const shouldDrawLabel = traj.length <= 15 || i % Math.ceil(traj.length / 8) === 0 || i === traj.length - 1;
 
     if (shouldDrawLabel) {
       chartElements += `
-        <circle cx="${x}" cy="${y}" r="4" fill="#F0B94D" stroke="#14171F" stroke-width="1.5"/>
-        <text class="chart-point-lbl" x="${x}" y="${minY + 20}" text-anchor="middle">${t.date}</text>
+        <circle class="chart-point" data-idx="${i}" cx="${c.x}" cy="${c.y}" r="5" fill="#F0B94D" stroke="#14171F" stroke-width="1.5"/>
+        <text class="chart-point-lbl" x="${c.x}" y="${minY + 20}" text-anchor="middle">${c.date}</text>
       `;
     }
   });
 
-  const path = `<polyline points="${points}" fill="none" stroke="#F0B94D" stroke-width="3" stroke-linejoin="round"/>`;
+  const defs = `<defs><linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%" stop-color="#F0B94D" stop-opacity="0.28"/>
+    <stop offset="100%" stop-color="#F0B94D" stop-opacity="0"/>
+  </linearGradient></defs>`;
 
   chartSvg.innerHTML = `
+    ${defs}
     ${gridLines}
+    ${area}
     ${path}
     ${chartElements}
   `;
+
+  chartTooltipIdx = null;
+  document.getElementById('chartTooltip').classList.remove('open');
+
+  chartSvg.querySelectorAll('.chart-point').forEach(circle => {
+    circle.style.cursor = 'pointer';
+    circle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const idx = parseInt(circle.dataset.idx);
+      if (chartTooltipIdx === idx) {
+        chartTooltipIdx = null;
+        document.getElementById('chartTooltip').classList.remove('open');
+        return;
+      }
+      chartTooltipIdx = idx;
+      showChartTooltip(coords[idx], amount, shares, circle);
+    });
+  });
 }
+
+function showChartTooltip(point, amount, shares, circleEl){
+  const tooltip = document.getElementById('chartTooltip');
+  const valueAtPoint = shares * point.price;
+
+  tooltip.innerHTML = `
+    <div class="ct-year">${point.date}</div>
+    <div class="ct-row"><span>Share price</span><strong>${fmtPrice(point.price)}</strong></div>
+    <div class="ct-row"><span>Your $${amount.toLocaleString()} was worth</span><strong>$${valueAtPoint.toLocaleString('en-US', {maximumFractionDigits: 0})}</strong></div>
+  `;
+
+  tooltip.classList.add('open');
+
+  const wrap = document.querySelector('.chart-canvas-wrap');
+  const wrapRect = wrap.getBoundingClientRect();
+  const circleRect = circleEl.getBoundingClientRect();
+  const pxX = circleRect.left + circleRect.width / 2 - wrapRect.left;
+  const pxY = circleRect.top - wrapRect.top;
+
+  const tw = tooltip.offsetWidth;
+  const th = tooltip.offsetHeight;
+  let left = pxX - tw / 2;
+  if (left < 8) left = 8;
+  if (left + tw > wrapRect.width - 8) left = wrapRect.width - 8 - tw;
+  let top = pxY - th - 14;
+  if (top < 8) top = pxY + circleRect.height + 10;
+  tooltip.style.left = left + 'px';
+  tooltip.style.top = top + 'px';
+}
+
+document.addEventListener('click', (e) => {
+  if (!e.target.classList.contains('chart-point')) {
+    chartTooltipIdx = null;
+    document.getElementById('chartTooltip').classList.remove('open');
+  }
+});
 
 runBtn.addEventListener('click', runSimulation);
 chartUpdateBtn.addEventListener('click', runSimulation);

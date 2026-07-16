@@ -507,15 +507,7 @@
       <a href="#stack">Stack</a>
       <a href="#reflection">Reflection</a>
     </div>
-    <div class="dropdown-container">
-      <a class="nav-btn dropdown-trigger">Case Studies ▾</a>
-      <div class="dropdown-menu liquid-glass">
-        <a href="regulation-inspector.html" class="active">Regulation Inspector</a>
-        <a href="ai-risk-workflow.html">AI Risk Workflow</a>
-        <a href="team-resource-tool.html">Team Resource Tool</a>
-        <a href="stock-time-machine.html">Stock Time Machine</a>
-      </div>
-    </div>
+    <a class="nav-btn" href="resume.pdf" download="Kenneth-Evbuomwan-CV.pdf">Download CV</a>
   </nav>
 </div>
 
@@ -538,7 +530,6 @@
       <div class="hero-ctas">
         <a class="btn live-demo-trigger" href="javascript:void(0)">Live Sandbox ⚡</a>
         <a class="btn-ghost" href="#dashboards">See the dashboards</a>
-        <a class="btn-ghost" href="https://github.com/KennethEvb/regulation-inspector" target="_blank" rel="noopener">Source code</a>
       </div>
     </div>
 
@@ -777,7 +768,6 @@
   <p>Regulation Inspector — a personal project exploring regulatory data structuring and compliance dashboards.</p>
   <div class="flinks">
     <a href="ai-risk-workflow.html">Next: AI Risk Workflow</a>
-    <a href="https://github.com/KennethEvb/regulation-inspector" target="_blank" rel="noopener">GitHub</a>
     <a href="https://www.linkedin.com/in/kenneth-evbuomwan/" target="_blank" rel="noopener">LinkedIn</a>
     <a href="#top">Back to top</a>
   </div>
@@ -839,7 +829,11 @@ function showRefPopoverFor(chip) {
   
   // Find specific highlighted segment matching this source key
   const hl = card.querySelector(`.hl[data-ref="${key}"]`) || card.querySelector('.hl');
-  const hlRect = hl.getBoundingClientRect();
+  // getBoundingClientRect() on a wrapped inline span returns the union box across
+  // every line it touches, which is nearly the full paragraph width here — that's
+  // why the popover used to drift toward the same spot regardless of which phrase
+  // was hovered. getClientRects()[0] gives the actual first line-fragment instead.
+  const hlRect = hl.getClientRects()[0] || hl.getBoundingClientRect();
   
   // Calculate horizontal position - centered on the specific highlighted regulation text segment (.hl)
   let left = (hlRect.left + hlRect.width / 2) - cardRect.left - 150;

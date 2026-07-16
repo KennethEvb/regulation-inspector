@@ -395,15 +395,7 @@
       <a href="#integration">Integration</a>
       <a href="#impact">Impact</a>
     </div>
-    <div class="dropdown-container">
-      <a class="nav-btn dropdown-trigger">Case Studies ▾</a>
-      <div class="dropdown-menu liquid-glass">
-        <a href="regulation-inspector.html">Regulation Inspector</a>
-        <a href="ai-risk-workflow.html">AI Risk Workflow</a>
-        <a href="team-resource-tool.html" class="active">Team Resource Tool</a>
-        <a href="stock-time-machine.html">Stock Time Machine</a>
-      </div>
-    </div>
+    <a class="nav-btn" href="resume.pdf" download="Kenneth-Evbuomwan-CV.pdf">Download CV</a>
   </nav>
 </div>
 
@@ -710,19 +702,19 @@
     <h2 style="font-size:30px;">How the components tie together</h2>
     <div class="gov-flow">
       <div class="gov-step">
-        <div class="gov-icon iam">Entra</div>
+        <div class="gov-icon iam">⟳</div>
         <h3>IAM Sync</h3>
         <p>A scheduled Power Automate flow pulls the roster from Microsoft Entra ID daily, keeping leavers, starters, and department changes updated automatically.</p>
       </div>
       <div class="gov-arrow">→</div>
       <div class="gov-step">
-        <div class="gov-icon cap">Apps</div>
+        <div class="gov-icon cap">✓</div>
         <h3>Capacity Form</h3>
         <p>A Power Apps form validates allocations as they are input — ensuring split FTEs don't exceed availability (e.g. flagging David Kim when his allocation hits 1.2 FTE).</p>
       </div>
       <div class="gov-arrow">→</div>
       <div class="gov-step">
-        <div class="gov-icon sync">Jira</div>
+        <div class="gov-icon sync">⇄</div>
         <h3>Jira Connector</h3>
         <p>The system is ready: connect JIRA Cloud to Dataverse via standard APIs to map project tasks and active sprints against the FTE allocations.</p>
       </div>

@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build && cp portfolio/*.html dist/",
+    "build": "vite build && cp portfolio/*.html portfolio/*.pdf dist/",
     "preview": "vite preview",
     "lint": "tsc --noEmit"
   },
