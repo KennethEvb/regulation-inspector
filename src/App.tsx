@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { Analytics } from "@vercel/analytics/react";
 import { Clause, SeverityType, StatusType, FilterState } from "./types";
 import { INITIAL_CLAUSES, SAMPLE_TEXTS, DEFAULT_DOMAINS } from "./data";
 import DashboardOverview from "./components/DashboardOverview";
@@ -2232,6 +2233,7 @@ export default function App() {
         </footer>
       )}
 
+      <Analytics />
     </div>
   );
 }
