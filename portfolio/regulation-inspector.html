@@ -518,7 +518,7 @@
     <div>
       <div class="eyebrow">Personal Project</div>
       <h1>Reading 400 pages of regulation shouldn't require a legal team.</h1>
-      <p class="lede">Regulation Inspector turns dense regulatory text — starting with DORA — into a structured, queryable dataset and a dashboard that tracks remediation progress by domain, owner, and severity.</p>
+      <p class="lede">Regulation Inspector turns dense regulatory text (starting with DORA) into a structured, queryable dataset and a dashboard that tracks remediation progress by domain, owner, and severity.</p>
       <div class="tag-row">
         <span class="tag">PYTHON</span>
         <span class="tag">REACT</span>
@@ -570,7 +570,7 @@
     <div class="lead-block">
       <div class="eyebrow">The problem</div>
       <h2>Compliance teams read regulation once and then lose track of it in spreadsheets.</h2>
-      <p>Regulatory documents like DORA span hundreds of articles across wildly different operational domains — ICT risk, business continuity, incident reporting, third-party oversight. Reviewing them manually is slow, and once a gap is identified, tracking its remediation tends to live in disconnected trackers that fall out of date. I built this project to see whether that first pass — reading, classifying, and structuring a regulation — could be automated well enough to hand a compliance team a live dashboard instead of a static PDF annotation.</p>
+      <p>Regulatory documents like DORA span hundreds of articles across wildly different operational domains: ICT risk, business continuity, incident reporting, third-party oversight. Reviewing them manually is slow, and once a gap is identified, tracking its remediation tends to live in disconnected trackers that fall out of date. I built this project to see whether that first pass (reading, classifying, and structuring a regulation) could be automated well enough to hand a compliance team a live dashboard instead of a static PDF annotation.</p>
     </div>
   </div>
 </section>
@@ -583,7 +583,7 @@
       <div class="step">
         <div class="num">01</div>
         <h3>Upload &amp; extract</h3>
-        <p>Parse the regulation PDF while preserving article and paragraph structure — not just raw text.</p>
+        <p>Parse the regulation PDF while preserving article and paragraph structure. Not just raw text.</p>
       </div>
       <div class="step">
         <div class="num">02</div>
@@ -598,7 +598,7 @@
       <div class="step">
         <div class="num">04</div>
         <h3>Track</h3>
-        <p>Reviewed clauses get an owner and a due date where needed — visualised across three dashboard views, with AI-suggested and human-confirmed always kept visually distinct.</p>
+        <p>Reviewed clauses get an owner and a due date where needed, visualised across three dashboard views, with AI-suggested and human-confirmed always kept visually distinct.</p>
       </div>
     </div>
   </div>
@@ -612,7 +612,7 @@
       <div class="showcase-head">
         <div>
           <h2>Three ways to look at the same data</h2>
-          <p>Executive summary, working tracker, and risk concentration — all built from the same clause-level dataset. Click a <strong style="color:#fff;">Coverage</strong> badge in the Tracker for drill-down detail. All data shown is illustrative — no client data.</p>
+          <p>Executive summary, working tracker, and risk concentration, all built from the same clause-level dataset. Click a <strong style="color:#fff;">Coverage</strong> badge in the Tracker for drill-down detail. All data shown is illustrative — no client data.</p>
         </div>
         <div class="view-tabs">
           <div class="vtab active" data-view="d1">Overview</div>
@@ -707,7 +707,7 @@
   <div class="wrap">
     <div class="eyebrow">Governance</div>
     <h2 style="font-size:30px;">A "Covered" status is only as good as the link behind it.</h2>
-    <p style="font-size:15.5px; color:var(--ink-2); margin-top:16px; max-width:680px;">Pointing a requirement at an internal document is the easy part. The document moves, gets renamed, gets archived, or the SharePoint folder gets restructured — and if nothing catches that, a clause stays marked "Covered" against evidence that no longer exists. That's a silent compliance gap, which is worse than an open one because nobody's looking for it.</p>
+    <p style="font-size:15.5px; color:var(--ink-2); margin-top:16px; max-width:680px;">Pointing a requirement at an internal document is the easy part. The document moves, gets renamed, gets archived, or the SharePoint folder gets restructured. If nothing catches that, a clause stays marked "Covered" against evidence that no longer exists — a silent compliance gap, and worse than an open one, because nobody's looking for it.</p>
 
     <div class="gov-flow">
       <div class="gov-step">
@@ -719,17 +719,17 @@
       <div class="gov-step">
         <div class="gov-icon warn">!</div>
         <h3>Change detected</h3>
-        <p>If a link breaks, moves, or is renamed, the clause is flagged — its "Covered" status stays visible, but marked for attention rather than silently trusted.</p>
+        <p>If a link breaks, moves, or is renamed, the clause is flagged; its "Covered" status stays visible, but marked for attention rather than silently trusted.</p>
       </div>
       <div class="gov-arrow">→</div>
       <div class="gov-step">
         <div class="gov-icon ticket">⚑</div>
         <h3>Ticket auto-raised</h3>
-        <p>A ticket routes to the department that owns the domain — not a generic queue — so the right team re-confirms coverage or supplies a new reference.</p>
+        <p>A ticket routes to the department that owns the domain (not a generic queue), so the right team re-confirms coverage or supplies a new reference.</p>
       </div>
     </div>
 
-    <p style="font-size:13.5px; color:var(--soft); margin-top:28px; max-width:640px;">Try it: in the Tracker view above, <span style="color:var(--ink-2); font-weight:600;">Art. 28(4)</span> shows a small warning dot next to its Gap badge — click it to see what a live link-health alert and its auto-raised ticket look like.</p>
+    <p style="font-size:13.5px; color:var(--soft); margin-top:28px; max-width:640px;">Try it: in the Tracker view above, <span style="color:var(--ink-2); font-weight:600;">Art. 28(4)</span> shows a small warning dot next to its Gap badge. Click it to see what a live link-health alert and its auto-raised ticket look like.</p>
   </div>
 </section>
 
@@ -750,7 +750,7 @@
 <section id="reflection">
   <div class="wrap">
     <div class="eyebrow">Reflection</div>
-    <h2 style="font-size:30px;">What this project sharpened</h2>
+    <h2 style="font-size:30px;">Where the real work was</h2>
     <div class="reflect-grid">
       <div class="reflect-card">
         <h3>Data modelling over one-off scripts</h3>
@@ -758,14 +758,14 @@
       </div>
       <div class="reflect-card">
         <h3>Dashboards are a translation problem</h3>
-        <p>The same clause-level data needs to answer very different questions depending on the audience — a status check, a working list, or a prioritisation view — which is what drove the three-dashboard structure.</p>
+        <p>The same clause-level data needs to answer very different questions depending on the audience: a status check, a working list, or a prioritisation view. That shaped the three-dashboard structure.</p>
       </div>
     </div>
   </div>
 </section>
 
 <footer>
-  <p>Regulation Inspector — a personal project exploring regulatory data structuring and compliance dashboards.</p>
+  <p>Regulation Inspector: a personal project exploring regulatory data structuring and compliance dashboards.</p>
   <div class="flinks">
     <a href="ai-risk-workflow.html">Next: AI Risk Workflow</a>
     <a href="https://www.linkedin.com/in/kenneth-evbuomwan/" target="_blank" rel="noopener">LinkedIn</a>

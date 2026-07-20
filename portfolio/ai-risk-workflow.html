@@ -354,7 +354,7 @@
     <div>
       <div class="eyebrow">Concept Case Study</div>
       <h1>AI governance shouldn't live in email threads and spreadsheets.</h1>
-      <p class="lede">A structured AI Risk Assessment Workflow on the Microsoft Power Platform — standardised intake, automated scoring and approval routing, a single source of truth in Dataverse, and real-time governance dashboards in Power BI.</p>
+      <p class="lede">A structured AI Risk Assessment Workflow on the Microsoft Power Platform: standardised intake, automated scoring and approval routing, a single source of truth in Dataverse, and real-time governance dashboards in Power BI.</p>
       <div class="tag-row">
         <span class="tag">POWER APPS</span>
         <span class="tag">POWER AUTOMATE</span>
@@ -411,7 +411,7 @@
     <div class="lead-block">
       <div class="eyebrow">The problem</div>
       <h2>AI systems get deployed faster than they get assessed.</h2>
-      <p>In most organisations, AI risk assessment lives in Word documents, email chains, and untracked spreadsheet approvals. The result is predictable: inconsistent risk scoring between teams, slow approval cycles, no visibility for leadership, and no single source of truth when a regulator — or an internal auditor — asks which AI systems are running and who signed them off. This concept explores whether the same governance discipline applied to regulatory text in <a href="regulation-inspector.html" style="color:var(--teal-deep); font-weight:600;">Regulation Inspector</a> can be applied to the AI systems themselves, using the Microsoft Power Platform as the delivery vehicle.</p>
+      <p>In most organisations, AI risk assessment lives in Word documents, email chains, and untracked spreadsheet approvals. The result is predictable: inconsistent risk scoring between teams, slow approval cycles, no visibility for leadership, and no single source of truth when a regulator (or an internal auditor) asks which AI systems are running and who signed them off. This concept explores whether the same governance discipline applied to regulatory text in <a href="regulation-inspector.html" style="color:var(--teal-deep); font-weight:600;">Regulation Inspector</a> can be applied to the AI systems themselves, using the Microsoft Power Platform as the delivery vehicle.</p>
     </div>
   </div>
 </section>
@@ -424,12 +424,12 @@
       <div class="step">
         <div class="num">01</div>
         <h3>Standardised intake</h3>
-        <p>A guided Power Apps form captures every use case the same way — owner, model type, dataset sources, intended use — with conditional privacy questions when personal data is involved.</p>
+        <p>A guided Power Apps form captures every use case the same way (owner, model type, dataset sources, intended use), with conditional privacy questions when personal data is involved.</p>
       </div>
       <div class="step">
         <div class="num">02</div>
         <h3>Automated scoring</h3>
-        <p>Power Automate scores each submission against weighted risk factors — privacy, bias, security, transparency — producing a consistent overall rating instead of a gut feel.</p>
+        <p>Power Automate scores each submission against weighted risk factors: privacy, bias, security, transparency, producing a consistent overall rating instead of a gut feel.</p>
       </div>
       <div class="step">
         <div class="num">03</div>
@@ -552,7 +552,7 @@
       </div>
     </div>
 
-    <p class="storage-note"><strong>Storage is a swappable layer:</strong> Dataverse is the system of record in this design, with SharePoint holding evidence files. The same pattern runs on SharePoint Lists for lighter-weight tenants without premium licensing, or on Azure SQL where scale and existing reporting infrastructure justify it — the flow logic and dashboards don't change, only the connector.</p>
+    <p class="storage-note"><strong>Storage is a swappable layer:</strong> Dataverse is the system of record in this design, with SharePoint holding evidence files. The same pattern runs on SharePoint Lists for lighter-weight tenants without premium licensing, or on Azure SQL where scale and existing reporting infrastructure justify it. The flow logic and dashboards don't change; only the connector does.</p>
   </div>
 </section>
 
@@ -564,7 +564,7 @@
       <div class="showcase-head">
         <div>
           <h2>One dataset, three governance views</h2>
-          <p>Executive overview, working assessment tracker, and model inventory — all driven by the same Dataverse records. Click a <strong style="color:#fff;">Risk</strong> badge in the Tracker for the factor-level breakdown. All data shown is illustrative.</p>
+          <p>Executive overview, working assessment tracker, and model inventory, all driven by the same Dataverse records. Click a <strong style="color:#fff;">Risk</strong> badge in the Tracker for the factor-level breakdown. All data shown is illustrative.</p>
         </div>
         <div class="view-tabs">
           <div class="vtab active" data-view="d1">Overview</div>
@@ -641,7 +641,7 @@
   <div class="wrap">
     <div class="eyebrow">Data model</div>
     <h2 style="font-size:30px;">One structured model in Dataverse — not six spreadsheets.</h2>
-    <p style="font-size:15.5px; color:var(--ink-2); margin-top:16px; max-width:680px;">Every assessment, score, approval, and mitigation action lives in a related table with enforced fields. That's what makes the audit trail automatic rather than an after-the-fact reconstruction — and it's why the dashboards never disagree with the record.</p>
+    <p style="font-size:15.5px; color:var(--ink-2); margin-top:16px; max-width:680px;">Every assessment, score, approval, and mitigation action lives in a related table with enforced fields. The audit trail is automatic rather than an after-the-fact reconstruction, which is also why the dashboards never disagree with the record.</p>
     <div class="model-grid">
       <div class="model-card">
         <div class="t-name">AI Use Case</div>
@@ -698,25 +698,25 @@
       <div class="gov-step">
         <div class="gov-icon trigger">▶</div>
         <h3>Trigger &amp; record</h3>
-        <p>A Power Apps submission creates the Assessment Record in Dataverse — nothing enters the process any other way.</p>
+        <p>A Power Apps submission creates the Assessment Record in Dataverse; nothing enters the process any other way.</p>
       </div>
       <div class="gov-arrow">→</div>
       <div class="gov-step">
         <div class="gov-icon score">Σ</div>
         <h3>Score</h3>
-        <p>Scoring logic weighs model type, data sensitivity, and each risk factor into a single rating — the same way, every time.</p>
+        <p>Scoring logic weighs model type, data sensitivity, and each risk factor into a single rating, the same way every time.</p>
       </div>
       <div class="gov-arrow">→</div>
       <div class="gov-step">
         <div class="gov-icon route">⇄</div>
         <h3>Route &amp; remind</h3>
-        <p>Approvals route by risk level, with automated reminders and escalation when an SLA is breached — no chasing by email.</p>
+        <p>Approvals route by risk level. Automated reminders and escalation kick in when an SLA is breached, so nothing needs chasing by email.</p>
       </div>
       <div class="gov-arrow">→</div>
       <div class="gov-step">
         <div class="gov-icon log">⚑</div>
         <h3>Finalise &amp; log</h3>
-        <p>A risk summary is generated, the audit log is stored, and the dashboards update — all from the same event.</p>
+        <p>A risk summary is generated, the audit log is stored, and the dashboards update, all from the same event.</p>
       </div>
     </div>
     <div class="branch-note">
@@ -724,7 +724,7 @@
       <strong>Yes</strong> → route to all three stakeholders: Privacy → Security → AI Governance.&nbsp;
       <strong>No</strong> → route to Privacy only. Routing runs parallel or sequential depending on risk level, so low-risk use cases aren't stuck in a queue built for high-risk ones.
     </div>
-    <p style="font-size:15px; color:var(--ink-2); margin-top:36px; max-width:680px;"><strong>Built for audit from day one:</strong> immutable logs, versioned assessments, evidence attachments, and exportable audit packs — designed to support frameworks such as:</p>
+    <p style="font-size:15px; color:var(--ink-2); margin-top:36px; max-width:680px;"><strong>Built for audit from day one:</strong> immutable logs, versioned assessments, evidence attachments, and exportable audit packs, designed to support frameworks such as:</p>
     <div class="fw-row">
       <span class="tag">EU AI ACT</span>
       <span class="tag">GDPR</span>
@@ -752,10 +752,10 @@
       <div class="impact-card">
         <div class="i-cat">Process</div>
         <div class="i-big">Zero email chains</div>
-        <p>Manual documents and duplicated effort eliminated — one intake, one record, one report.</p>
+        <p>Manual documents and duplicated effort eliminated: one intake, one record, one report.</p>
       </div>
     </div>
-    <p class="modelled-note">Figures are modelled target outcomes for this concept design — illustrating the scale of improvement a workflow like this is built to deliver, not measured client results.</p>
+    <p class="modelled-note">Figures are modelled target outcomes for this concept design, meant to illustrate the scale of improvement a workflow like this could deliver, not measured client results.</p>
   </div>
 </section>
 
@@ -776,15 +776,15 @@
 <section id="reflection">
   <div class="wrap">
     <div class="eyebrow">Reflection</div>
-    <h2 style="font-size:30px;">What designing this sharpened</h2>
+    <h2 style="font-size:30px;">Four things worth remembering</h2>
     <div class="reflect-grid">
       <div class="reflect-card">
         <h3>Centralise logic in the data layer</h3>
-        <p>Keeping scoring rules and risk factors in Dataverse — not hard-coded into individual flows — means one change propagates everywhere. The same lesson that shaped Regulation Inspector's config-driven taxonomy applies here.</p>
+        <p>Keeping scoring rules and risk factors in Dataverse, not hard-coded into individual flows, means one change propagates everywhere. The same lesson that shaped Regulation Inspector's config-driven taxonomy applies here.</p>
       </div>
       <div class="reflect-card">
         <h3>Approval paths are a people problem first</h3>
-        <p>The hardest part isn't the flow — it's getting Privacy, Security, and AI Governance to agree on who decides what, in which order. Stakeholder workshops belong at the start of the build, not the end.</p>
+        <p>The hardest part isn't the flow. It's getting Privacy, Security, and AI Governance to agree on who decides what, in which order. Stakeholder workshops belong at the start of the build, not the end.</p>
       </div>
       <div class="reflect-card">
         <h3>Risk scoring is never finished</h3>
@@ -792,14 +792,14 @@
       </div>
       <div class="reflect-card">
         <h3>Dashboards drive engagement</h3>
-        <p>Leadership doesn't read assessment records — they look at the risk distribution chart. Making governance visible is what turns it from a compliance chore into something the business actually steers by.</p>
+        <p>Leadership doesn't read assessment records. They look at the risk distribution chart. Making governance visible is what turns it from a compliance chore into something the business actually steers by.</p>
       </div>
     </div>
   </div>
 </section>
 
 <footer>
-  <p>AI Risk Assessment Workflow — a concept case study in process optimisation and responsible AI governance.</p>
+  <p>AI Risk Assessment Workflow. A concept case study in process optimisation and responsible AI governance.</p>
   <div class="flinks">
     <a href="https://www.linkedin.com/in/kenneth-evbuomwan/" target="_blank" rel="noopener">LinkedIn</a>
     <a href="#top">Back to top</a>

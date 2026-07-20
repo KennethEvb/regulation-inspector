@@ -406,7 +406,7 @@
     <div>
       <div class="eyebrow">Concept Case Study</div>
       <h1>Resource planning shouldn't stay stuck in spreadsheet formats.</h1>
-      <p class="lede">An IAM-integrated resource planner that reconciles team availability, FTE allocations, and initiative assignments in one central data model — designed to scale dynamically from manual MVP to an enterprise JIRA-connected system.</p>
+      <p class="lede">An IAM-integrated resource planner that reconciles team availability, FTE allocations, and initiative assignments in one central data model, designed to scale dynamically from manual MVP to an enterprise JIRA-connected system.</p>
       <div class="tag-row">
         <span class="tag">POWER PLATFORM</span>
         <span class="tag">DATAVERSE</span>
@@ -647,7 +647,7 @@
   <div class="wrap">
     <div class="eyebrow">Data model</div>
     <h2 style="font-size:30px;">A robust relational schema in Dataverse.</h2>
-    <p style="font-size:15.5px; color:var(--ink-2); margin-top:16px; max-width:680px;">Rosters, initiatives, allocations, and demands are held in six related tables with enforced keys and validation rules. That's what prevents double-booking at the database level — before a user can even save the record.</p>
+    <p style="font-size:15.5px; color:var(--ink-2); margin-top:16px; max-width:680px;">Rosters, initiatives, allocations, and demands are held in six related tables with enforced keys and validation rules. Double-booking gets caught at the database level, before a user can even save the record.</p>
     <div class="model-grid">
       <div class="model-card">
         <div class="t-name">Team Member (Roster)</div>
@@ -710,7 +710,7 @@
       <div class="gov-step">
         <div class="gov-icon cap">✓</div>
         <h3>Capacity Form</h3>
-        <p>A Power Apps form validates allocations as they are input — ensuring split FTEs don't exceed availability (e.g. flagging David Kim when his allocation hits 1.2 FTE).</p>
+        <p>A Power Apps form validates allocations as they are input, ensuring split FTEs don't exceed availability (e.g. flagging David Kim when his allocation hits 1.2 FTE).</p>
       </div>
       <div class="gov-arrow">→</div>
       <div class="gov-step">
@@ -743,14 +743,14 @@
         <p>A centralized portfolio view of team capacity, holiday logs, and unfilled project demand in a single dashboard.</p>
       </div>
     </div>
-    <p class="modelled-note">Figures are modelled target outcomes for this concept design — illustrating the scale of improvement a structured planner like this is built to deliver, not measured client results.</p>
+    <p class="modelled-note">These are modelled projections for a concept design, not measured client results: sized to show what a structured planner like this is built to deliver.</p>
   </div>
 </section>
 
 <section id="reflection">
   <div class="wrap">
     <div class="eyebrow">Reflection</div>
-    <h2 style="font-size:30px;">What designing this sharpened</h2>
+    <h2 style="font-size:30px;">Decisions that held up</h2>
     <div class="reflect-grid">
       <div class="reflect-card">
         <h3>Design for modular growth</h3>
@@ -758,7 +758,7 @@
       </div>
       <div class="reflect-card">
         <h3>Enforce rules at the database layer</h3>
-        <p>Trying to prevent overallocation inside individual form screens is brittle. Creating validation rules directly in Dataverse ensures data integrity — no matter which app writes the record.</p>
+        <p>Trying to prevent overallocation inside individual form screens is brittle. Creating validation rules directly in Dataverse ensures data integrity, no matter which app writes the record.</p>
       </div>
       <div class="reflect-card">
         <h3>Capacity planning is a timing problem</h3>

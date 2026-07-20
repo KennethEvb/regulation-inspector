@@ -144,7 +144,7 @@
 
   .about p{font-size:15.5px; color:var(--ink-2); max-width:680px; margin-top:16px;}
 
-  #skills{scroll-margin-top:100px;}
+  #skills, #certifications{scroll-margin-top:100px;}
   .skills-grid{display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:20px; margin-top:36px;}
   .skill-col{background:var(--paper-2); border:1px solid var(--line); border-radius:14px; padding:26px 24px;}
   .skill-col h3{font-family:'JetBrains Mono',monospace; font-size:11px; text-transform:uppercase; letter-spacing:0.6px; color:var(--teal-deep); font-weight:600; margin:0 0 18px;}
@@ -152,6 +152,18 @@
   .skill-item:first-of-type{border-top:none; padding-top:0;}
   .skill-item .name{font-family:'Inter',sans-serif; font-size:14px; font-weight:600; color:var(--ink);}
   .skill-item .desc{font-family:'Inter',sans-serif; font-size:12.5px; color:var(--soft); margin-top:3px; line-height:1.5;}
+
+  .cert-row{display:flex; gap:32px; align-items:center; margin-top:36px; flex-wrap:wrap;}
+  .cert-badge-wrap{background:var(--paper-2); border:1px solid var(--line); border-radius:14px; padding:20px; flex-shrink:0; display:flex; align-items:center; justify-content:center;}
+  .cert-text{flex:1; min-width:240px;}
+  .cert-text h3{font-size:19px; font-weight:600; margin:0 0 10px;}
+  .cert-text p{font-size:14px; color:var(--ink-2); line-height:1.6; max-width:520px;}
+  .cert-status{display:inline-flex; align-items:center; padding:4px 10px; border-radius:999px; font-family:'JetBrains Mono',monospace; font-size:9.5px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:12px;}
+  .cert-status.achieved{background:rgba(31,111,107,0.08); border:1px solid rgba(31,111,107,0.22); color:var(--teal-deep);}
+  .cert-status.pending{background:rgba(240,185,77,0.14); border:1px solid rgba(240,185,77,0.4); color:#8A6410;}
+  .cert-secondary{margin-top:28px; padding-top:24px; border-top:1px solid var(--line); display:flex; align-items:center; gap:16px; flex-wrap:wrap;}
+  .cert-secondary h3{font-size:16px; font-weight:600; margin:0 0 3px;}
+  .cert-secondary p{font-size:13.5px; color:var(--soft); margin:0;}
 
   .projects-grid{display:grid; grid-template-columns:1fr; gap:20px; margin-top:36px;}
   .project-card{
@@ -221,10 +233,10 @@
       <span class="eyebrow" style="margin:0;">Business Intelligence · Data Consulting</span>
     </div>
     <h1>I translate dense, messy compliance data into high-impact operational dashboards.</h1>
-    <p class="lede">Data consultant going hands-on as a Business Intelligence Analyst — bridging business risk and intelligence engineering with Power BI, advanced SQL, and Databricks, while completing the Microsoft PL-300 certification.</p>
+    <p class="lede">Data consultant going hands-on as a Business Intelligence Analyst, bridging business risk and intelligence engineering with Power BI, advanced SQL, and Databricks, while completing the Microsoft PL-300 certification.</p>
     <div class="metrics-row">
       <div><span class="metric-val">7+ Yrs</span><span class="metric-lbl">Consulting Delivery</span></div>
-      <div><span class="metric-val">PL-300</span><span class="metric-lbl">Power BI Candidate</span></div>
+      <div><span class="metric-val">AWS</span><span class="metric-lbl">Cloud Practitioner</span></div>
       <div><span class="metric-val">BI</span><span class="metric-lbl">Specialist</span></div>
     </div>
     <div class="hero-ctas">
@@ -236,6 +248,7 @@
       <span class="tag">PYTHON</span>
       <span class="tag">POWER BI</span>
       <span class="tag">DATABRICKS</span>
+      <span class="tag">AWS</span>
       <span class="tag">POWER AUTOMATE</span>
       <span class="tag">DATA GOVERNANCE</span>
       <span class="tag">PL-300 (IN PROGRESS)</span>
@@ -248,7 +261,7 @@
   <div class="wrap">
     <div class="eyebrow">About</div>
     <h2 style="font-size:28px;">Consulting delivery, with a growing focus on BI.</h2>
-    <p>My background spans business intelligence, data governance, and hands-on consulting delivery — from reconciliation and deduplication projects to dashboarding and workflow automation. I'm most interested in the point where messy, unstructured source material (documents, spreadsheets, legacy systems) becomes something structured enough to build a decision on. The projects below are personal explorations of that same problem — applied to regulatory text, AI governance, and team capacity planning — plus one that's just for fun.</p>
+    <p>My background spans business intelligence, data governance, and hands-on consulting delivery: reconciliation and deduplication projects, dashboarding, workflow automation. I'm most interested in the point where messy, unstructured source material (documents, spreadsheets, legacy systems) becomes something structured enough to build a decision on. The projects below are personal explorations of that same problem, applied to regulatory text, AI governance, and team capacity planning. One of them is just for fun.</p>
   </div>
 </section>
 
@@ -274,6 +287,10 @@
         <div class="skill-item">
           <div class="name">Excel</div>
           <div class="desc">Complex modelling and Power Query pipelines.</div>
+        </div>
+        <div class="skill-item">
+          <div class="name">AWS</div>
+          <div class="desc">Cloud Practitioner certified — foundational services for cloud-hosted data platforms.</div>
         </div>
       </div>
       <div class="skill-col">
@@ -314,6 +331,31 @@
   </div>
 </section>
 
+<section id="certifications">
+  <div class="wrap">
+    <div class="eyebrow">Certifications</div>
+    <h2 style="font-size:28px;">Achieved, not just claimed.</h2>
+    <div class="cert-row">
+      <div class="cert-badge-wrap">
+        <div data-iframe-width="340" data-iframe-height="330" data-share-badge-id="6c433874-943b-41d7-9e9b-0e3137cec090" data-share-badge-host="https://www.credly.com"></div>
+      </div>
+      <div class="cert-text">
+        <span class="cert-status achieved">Achieved</span>
+        <h3>AWS Certified Cloud Practitioner</h3>
+        <p>Issued by Amazon Web Services Training and Certification, July 2026. Foundational cloud fluency: core AWS services, cloud economics, and security basics, useful for reasoning about cloud-hosted data platforms rather than treating them as a black box.</p>
+      </div>
+    </div>
+    <div class="cert-secondary">
+      <span class="cert-status pending">In Progress</span>
+      <div>
+        <h3>Microsoft Power BI Data Analyst Associate (PL-300)</h3>
+        <p>Expected August 2026.</p>
+      </div>
+    </div>
+  </div>
+</section>
+<script type="text/javascript" async src="//cdn.credly.com/assets/utilities/embed.js"></script>
+
 <section id="work">
   <div class="wrap">
     <div class="eyebrow">Selected Work</div>
@@ -324,7 +366,7 @@
         <div>
           <div class="status">Personal Project · 2026</div>
           <h3>Regulation Inspector</h3>
-          <p>Turns a regulatory PDF (starting with DORA) into a structured, domain-classified dataset — with a human-in-the-loop review layer that ties each requirement back to the internal document that actually covers it.</p>
+          <p>Turns a regulatory PDF (starting with DORA) into a structured, domain-classified dataset, with a human-in-the-loop review layer that ties each requirement back to the internal document that actually covers it.</p>
           <div class="tag-row">
             <span class="tag">PYTHON</span>
             <span class="tag">REACT</span>
@@ -350,7 +392,7 @@
         <div>
           <div class="status">Concept Case Study · 2026</div>
           <h3>AI Risk Assessment Workflow</h3>
-          <p>Replaces spreadsheet-and-email AI governance with a structured Power Platform workflow — standardised intake, automated risk scoring, routed approvals, and real-time Power BI dashboards backed by a Dataverse audit trail.</p>
+          <p>Replaces spreadsheet-and-email AI governance with a structured Power Platform workflow: standardised intake, automated risk scoring, routed approvals, and real-time Power BI dashboards backed by a Dataverse audit trail.</p>
           <div class="tag-row">
             <span class="tag">POWER APPS</span>
             <span class="tag">POWER AUTOMATE</span>
@@ -374,7 +416,7 @@
         <div>
           <div class="status">Concept Case Study · 2026</div>
           <h3>Team Management &amp; Resource Allocation Tool</h3>
-          <p>An IAM-integrated resource planner — team members, FTE allocations, and initiative assignments in one model, with an interactive mode switch that scales the same design from manual MVP to automated enterprise build with full JIRA integration.</p>
+          <p>An IAM-integrated resource planner that brings team members, FTE allocations, and initiative assignments into one model, with an interactive mode switch that scales the same design from manual MVP to automated enterprise build with full JIRA integration.</p>
           <div class="tag-row">
             <span class="tag">POWER PLATFORM</span>
             <span class="tag">IAM SYNC</span>
