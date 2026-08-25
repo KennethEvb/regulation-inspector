@@ -153,6 +153,17 @@
   .skill-item .name{font-family:'Inter',sans-serif; font-size:14px; font-weight:600; color:var(--ink);}
   .skill-item .desc{font-family:'Inter',sans-serif; font-size:12.5px; color:var(--soft); margin-top:3px; line-height:1.5;}
 
+  #experience{scroll-margin-top:100px;}
+  .exp-list{margin-top:36px; display:flex; flex-direction:column; gap:18px;}
+  .exp-item{background:var(--paper-2); border:1px solid var(--line); border-left:3px solid var(--teal-deep); border-radius:10px; padding:22px 26px;}
+  .exp-item h3{font-size:16px; font-weight:600; margin:0 0 8px; color:var(--ink);}
+  .exp-item p{font-size:14px; color:var(--ink-2); line-height:1.65; margin:0; max-width:720px;}
+
+  .cert-chip-grid{display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:12px; margin-top:28px; padding-top:24px; border-top:1px solid var(--line);}
+  .cert-chip{background:var(--paper-2); border:1px solid var(--line); border-radius:10px; padding:14px 16px;}
+  .cert-chip .name{font-size:13px; font-weight:600; color:var(--ink);}
+  .cert-chip .issuer{font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--soft); margin-top:4px; letter-spacing:0.2px;}
+
   .cert-row{display:flex; gap:32px; align-items:center; margin-top:36px; flex-wrap:wrap;}
   .cert-badge-wrap{background:var(--paper-2); border:1px solid var(--line); border-radius:14px; padding:20px; flex-shrink:0; display:flex; align-items:center; justify-content:center;}
   .cert-text{flex:1; min-width:240px;}
@@ -240,14 +251,14 @@
   <div class="wrap" style="position:relative; z-index:1;">
     <div class="eyebrow-row">
       <span class="status-pill"><span class="ping-dot"></span>Active &amp; Open to Roles</span>
-      <span class="eyebrow" style="margin:0;">Business Intelligence · Data Consulting</span>
+      <span class="eyebrow" style="margin:0;">Business Analysis · Data Governance · AI Enablement</span>
     </div>
-    <h1>I translate dense, messy compliance data into high-impact operational dashboards.</h1>
-    <p class="lede">Data consultant going hands-on as a Business Intelligence Analyst, bridging business risk and intelligence engineering with Power BI, advanced SQL, and Databricks.</p>
+    <h1>I translate dense, messy data into governed, decision-ready systems, from dashboards to data governance to AI adoption.</h1>
+    <p class="lede">Business Analyst working across data governance, AI enablement, and business intelligence, bridging regulatory delivery with Power BI, SQL, Collibra, and agentic AI.</p>
     <div class="metrics-row">
       <div><span class="metric-val">7+ Yrs</span><span class="metric-lbl">Consulting Delivery</span></div>
       <div><span class="metric-val">AWS</span><span class="metric-lbl">Cloud Practitioner</span></div>
-      <div><span class="metric-val">BI</span><span class="metric-lbl">Specialist</span></div>
+      <div><span class="metric-val">Governance</span><span class="metric-lbl">Focused</span></div>
     </div>
     <div class="hero-ctas">
       <a class="btn" href="#work">View my work</a>
@@ -262,6 +273,8 @@
       <span class="tag">POWER AUTOMATE</span>
       <span class="tag">DATA GOVERNANCE</span>
       <span class="tag">AI FOUNDATIONS</span>
+      <span class="tag">COLLIBRA</span>
+      <span class="tag">ONETRUST</span>
     </div>
   </div>
 </header>
@@ -270,7 +283,7 @@
   <div class="ambient-orb" style="top:20%; left:60%; width:420px; height:420px; background:linear-gradient(135deg, rgba(31,111,107,0.10), rgba(240,185,77,0.05));"></div>
   <div class="wrap">
     <div class="eyebrow">About</div>
-    <h2 style="font-size:28px;">Consulting delivery, with a growing focus on BI.</h2>
+    <h2 style="font-size:28px;">Consulting delivery, across data governance, AI enablement, and BI.</h2>
     <p>My background spans business intelligence, data governance, and hands-on consulting delivery: reconciliation and deduplication projects, dashboarding, workflow automation. I'm most interested in the point where messy, unstructured source material (documents, spreadsheets, legacy systems) becomes something structured enough to build a decision on. The projects below are personal explorations of that same problem, applied to regulatory text, AI governance, and team capacity planning. One of them is just for fun.</p>
   </div>
 </section>
@@ -302,9 +315,21 @@
           <div class="name">AWS</div>
           <div class="desc">Cloud Practitioner certified — foundational services for cloud-hosted data platforms.</div>
         </div>
+        <div class="skill-item">
+          <div class="name">Master Data Management</div>
+          <div class="desc">Modelled broker data into a unified golden-record view for a global insurance firm, using dimensional (fact and dimension table) modelling.</div>
+        </div>
       </div>
       <div class="skill-col">
         <h3>Data Governance &amp; Compliance</h3>
+        <div class="skill-item">
+          <div class="name">Collibra</div>
+          <div class="desc">Built data-flow and lineage maps from scratch for a multinational energy institution, strengthening audit-readiness across 4 regulatory processes.</div>
+        </div>
+        <div class="skill-item">
+          <div class="name">OneTrust</div>
+          <div class="desc">Designed an AI risk-assessment workflow for client governance controls and safe AI adoption.</div>
+        </div>
         <div class="skill-item">
           <div class="name">DORA</div>
           <div class="desc">Digital Operational Resilience Act — specialist focus.</div>
@@ -341,6 +366,27 @@
   </div>
 </section>
 
+<section id="experience">
+  <div class="wrap">
+    <div class="eyebrow">Selected Delivery</div>
+    <h2 style="font-size:28px;">Client work behind the toolkit above.</h2>
+    <div class="exp-list">
+      <div class="exp-item">
+        <h3>Stakeholder-led process digitisation</h3>
+        <p>Led a working group of 8 senior stakeholders across legal, technology, and business functions to digitise a manual Data Subject Access Request (DSAR) process end to end, discovery through UAT and live rollout, cutting turnaround time from days to hours.</p>
+      </div>
+      <div class="exp-item">
+        <h3>Regulatory assessment &amp; data validation</h3>
+        <p>Assessed a Global Systemically Important Bank's processes against DORA requirements, evaluating control design and third-party risk to inform remediation priorities. Performed large-scale data validation and reconciliation across mortgage-loan portfolios ahead of IFRS 9 regulatory submission.</p>
+      </div>
+      <div class="exp-item">
+        <h3>Predictive modelling (client work)</h3>
+        <p>Built a statistical model in Python and Scikit-Learn assessing branch viability for a bank, using local amenities, footfall, and parking data to inform a retention decision.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
 <section id="certifications">
   <div class="wrap">
     <div class="eyebrow">Certifications</div>
@@ -366,6 +412,28 @@
         <span class="cert-status achieved">Achieved</span>
         <h3>OpenAI Foundational Knowledge</h3>
         <p>Issued by OpenAI, August 2026. Core concepts in how large language models work and applied AI use.</p>
+      </div>
+    </div>
+    <div class="cert-chip-grid">
+      <div class="cert-chip">
+        <div class="name">Databricks Fundamentals</div>
+        <div class="issuer">Databricks Academy · March 2026</div>
+      </div>
+      <div class="cert-chip">
+        <div class="name">AI/BI for Data Analysts</div>
+        <div class="issuer">Databricks Knowledge Badge · March 2026</div>
+      </div>
+      <div class="cert-chip">
+        <div class="name">SQL Analytics on Databricks</div>
+        <div class="issuer">Databricks Knowledge Badge · May 2026</div>
+      </div>
+      <div class="cert-chip">
+        <div class="name">Google AI Essentials</div>
+        <div class="issuer">Google · March 2025</div>
+      </div>
+      <div class="cert-chip">
+        <div class="name">Google Prompting Essentials</div>
+        <div class="issuer">Google · March 2025</div>
       </div>
     </div>
   </div>
